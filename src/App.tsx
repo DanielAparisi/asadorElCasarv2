@@ -9,21 +9,30 @@ type Admin = {
 
 function App() {
   const [admins, setAdmins] = useState<Admin[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    getAdmins()
-  }, [])
+    const controller = new AbortController()
 
-  async function getAdmins() {
-    const { data, error } = await supabase.from('Admins').select()
+    async function getAdmins() {
+      const { data, error } = await supabase
+        .from('Admins')
+        .select()
+        .abortSignal(controller.signal)
 
-    if (error) {
-      console.error(error)
-      return
+      if (controller.signal.aborted) return
+
+      if (error) setError(error.message)
+      else setAdmins(data)
+
+      setLoading(false)
     }
 
-    setAdmins(data)
-  }
+    getAdmins()
+    return () => controller.abort()
+  }, [])
+
 
   return (
     <div>
