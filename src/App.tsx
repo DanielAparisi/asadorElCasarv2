@@ -37,7 +37,11 @@ function App() {
   return (
     <div>
       <h1>Admins</h1>
-      {admins.length === 0 ? (
+      {loading ? (
+        <p>Cargando…</p>
+      ) : error ? (
+        <p>Error: {error}</p>
+      ) : admins.length === 0 ? (
         <p>No hay admins todavía.</p>
       ) : (
         <ul>
