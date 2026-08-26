@@ -5,13 +5,13 @@ import {
   Boton,
   Entradilla,
   Etiqueta,
-  Foto,
   PAGE,
   Titular,
 } from '../components/ui'
 import Header from '../components/header'
 import MainBanner from '../components/mainbanner'
 import About from '../components/about'
+import Gallery from '../components/gallery'
 import Schedule from '../components/schedule'
 import UbicationSection from '../components/ubicationSection'
 import Footer from '../components/footer'
@@ -89,22 +89,7 @@ function Home() {
           <About />
         </section>
 
-        {/* ============ Galería ============ */}
-        <section id="fotos" className="pt-14.5 scroll-mt-6 max-[900px]:pt-11">
-          <Etiqueta rojo>La brasa</Etiqueta>
-          {/* Rotaciones distintas para que la retícula no quede rígida */}
-          <div className="grid grid-cols-3 gap-6.5 mt-5 max-[900px]:grid-cols-2 max-[900px]:gap-5 max-[560px]:grid-cols-1">
-            <Foto className="aspect-square -rotate-[1.1deg] max-[560px]:aspect-[3/2]">
-              foto · parrilla
-            </Foto>
-            <Foto className="aspect-square rotate-[0.7deg] max-[560px]:aspect-[3/2]">
-              foto · pollos
-            </Foto>
-            <Foto className="aspect-square -rotate-[0.5deg] max-[900px]:col-span-2 max-[900px]:aspect-video max-[560px]:col-span-1 max-[560px]:aspect-[3/2]">
-              foto · mesa
-            </Foto>
-          </div>
-        </section>
+        <Gallery />
 
         <Schedule />
 
