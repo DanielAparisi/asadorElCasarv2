@@ -32,7 +32,7 @@ function App() {
         <Route
           path="/admins"
           element={
-            session && esAdmin ? <Admins /> : <Navigate to={session ? '/404' : '/login'} replace />
+            session && esAdmin ? <Admins session={session} /> : <Navigate to={session ? '/404' : '/login'} replace />
           }
         />
 

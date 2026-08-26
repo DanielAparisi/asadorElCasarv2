@@ -3,6 +3,8 @@ import { useAuth } from '../hooks/useAuth'
 
 type Modo = 'login' | 'registro'
 
+const CORREO_SOLICITUDES = 'daniel.aparisi.lozano@gmail.com'
+
 function Login() {
   const [modo, setModo] = useState<Modo>('login')
   const [email, setEmail] = useState('')
@@ -76,6 +78,16 @@ function Login() {
           >
             {modo === 'login' ? 'Regístrate' : 'Inicia sesión'}
           </button>
+        </p>
+
+        {/* Registrarse no da acceso al panel: el alta de admin la hace a mano
+            un admin desde /admins. */}
+        <p className="mt-3 text-xs text-gray-500">
+          El acceso de administrador se concede a mano. Si lo necesitas, escribe a{' '}
+          <a href={`mailto:${CORREO_SOLICITUDES}`} className="underline">
+            {CORREO_SOLICITUDES}
+          </a>
+          .
         </p>
       </div>
     </div>
