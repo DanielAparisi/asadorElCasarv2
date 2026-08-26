@@ -30,6 +30,14 @@
   /* ---------- Líneas ---------- */
   --color-line:      #d7d5d2;  /* hairline sobre papel */
   --color-line-dark: #3d3a37;  /* hairline sobre tinta */
+
+  /* ---------- Tipografía ----------
+     Del repo de diseño. Se cargan desde Google Fonts en index.html; los
+     fallbacks son condensadas de sistema para que el titular no se
+     ensanche mientras llega Anton. */
+  --font-title: Anton, Haettenschweiler, "Arial Narrow Bold", Impact, sans-serif;
+  --font-body:  "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-mono:  "Space Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 }
 
 
@@ -55,6 +63,9 @@ html {
 body {
   background-color: var(--color-bg);
   color: var(--color-ink-soft);
+  font-family: var(--font-body);
+  font-size: 1.0625rem; /* 17px */
+  line-height: 1.6;
   /* Los titulares son enormes y de palo seco: sin suavizado se ven
      engordados en pantallas Retina. */
   -webkit-font-smoothing: antialiased;

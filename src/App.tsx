@@ -25,21 +25,13 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
 
-        {/* Ya con sesión, /login no tiene sentido: reparte según el rol. */}
+    
         <Route
           path="/login"
           element={
             session ? <Navigate to={esAdmin ? '/admins' : '/'} replace /> : <LoginPage />
           }
         />
-
-        {/* Un único guard para todo el panel: se comprueba aquí y las hijas se
-            montan dentro del Outlet del layout, ya sabiendo que hay permiso.
-            Este guard es comodidad, no seguridad — quien lo salte se topa con
-            el RLS de Postgres. Ver docs/seguridad.md.
-
-            Quien no es admin va al 404, no a una página de "sin permiso": así
-            no se le confirma que la ruta existe. */}
         <Route
           path="/admins"
           element={
