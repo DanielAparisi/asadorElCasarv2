@@ -4,6 +4,7 @@ import { useEsAdmin } from './hooks/useEsAdmin'
 import Home from './pages/home'
 import LoginPage from './pages/loginPage'
 import Page404 from './pages/404'
+import Spinner from './components/spinner'
 import AdminLayout from './pages/admins/layout'
 import Resumen from './pages/admins/resumen'
 import PlatoNuevo from './pages/admins/platoNuevo'
@@ -17,7 +18,7 @@ function App() {
 
   // Sin saber si hay sesión y si es admin no se puede decidir ninguna
   // redirección: al recargar en /admins expulsaríamos a un admin legítimo.
-  if (cargandoSesion || cargandoAdmin) return <p>Cargando…</p>
+  if (cargandoSesion || cargandoAdmin) return <Spinner />
 
   return (
     <BrowserRouter>

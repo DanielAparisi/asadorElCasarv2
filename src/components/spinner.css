@@ -1,0 +1,74 @@
+/* ============================================================
+   Spinner — dirección visual de "cartel de barrio": bloques planos,
+   borde grueso y sombra dura, igual que el resto del diseño.
+
+   Vive en su propio archivo para no meter animaciones en index.css,
+   que es solo paleta y base.
+   ============================================================ */
+
+.spinner {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.75rem;
+  background-color: var(--color-bg);
+}
+
+.spinner__blocks {
+  display: flex;
+  gap: 0.875rem;
+  /* Reserva el recorrido de la animación para que el conjunto no
+     cambie de alto al saltar los bloques. */
+  padding-block: 0.75rem;
+}
+
+.spinner__block {
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 3px solid var(--color-ink);
+  box-shadow: 4px 4px 0 var(--color-ink);
+  animation: spinner-salto 1.05s ease-in-out infinite;
+}
+
+/* Los tres colores de la casa, saltando en cascada. */
+.spinner__block:nth-child(1) { background-color: var(--color-red);   animation-delay: 0s; }
+.spinner__block:nth-child(2) { background-color: var(--color-amber); animation-delay: 0.14s; }
+.spinner__block:nth-child(3) { background-color: var(--color-card);  animation-delay: 0.28s; }
+
+@keyframes spinner-salto {
+  0%, 65%, 100% {
+    transform: translateY(0);
+    box-shadow: 4px 4px 0 var(--color-ink);
+  }
+  30% {
+    transform: translateY(-0.75rem);
+    /* La sombra se alarga al subir: el bloque se despega del papel. */
+    box-shadow: 4px 10px 0 var(--color-ink);
+  }
+}
+
+.spinner__texto {
+  margin: 0;
+  font-family: "Space Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ink-mute);
+}
+
+/* Sin movimiento para quien lo haya pedido en su sistema: los bloques
+   se quedan quietos y solo laten en opacidad. El indicador sigue
+   comunicando que algo está pasando, sin desplazamientos. */
+@media (prefers-reduced-motion: reduce) {
+  .spinner__block {
+    animation: spinner-latido 1.4s ease-in-out infinite;
+  }
+
+  @keyframes spinner-latido {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.45; }
+  }
+}

@@ -1,1 +1,77 @@
 @import "tailwindcss";
+
+/* `static` obliga a Tailwind a emitir TODOS los tokens al CSS final. Sin esa
+   palabra elimina los que ningún utility usa todavía, y `var(--color-cream)`
+   escrito a mano no resolvería. La paleta es la referencia del proyecto:
+   tiene que estar entera aunque aún no se use. Cuesta unos 400 bytes. */
+@theme static {
+  /* ---------- Superficies ---------- */
+  --color-bg:         #f4f1ea;  /* papel cálido, fondo de todo */
+  --color-cream:      #fdf6e6;  /* trama de los huecos de foto */
+  --color-cream-alt:  #f4ecd8;  /* segunda trama, para alternar */
+  --color-card:       #fffdf7;  /* fichas sobre el papel */
+  --color-white:      #ffffff;  /* texto sobre rojo y sobre tinta */
+
+  /* ---------- Tinta ---------- */
+  --color-ink:        #16130f;  /* bloques, bordes y titulares */
+  --color-ink-soft:   #3d3a37;  /* párrafos */
+  --color-ink-mute:   #716c65;  /* notas y placeholders (ver nota 1) */
+
+  /* ---------- Acentos ---------- */
+  --color-red:        #e02b20;  /* el del logo. Fondo, no texto (nota 2) */
+  --color-red-dark:   #b31f16;  /* hover, y el rojo válido para texto */
+  --color-amber:      #f2b53c;  /* destacados. Siempre como fondo (nota 3) */
+  --color-amber-dark: #e5a72c;  /* su hover */
+
+  /* ---------- Sobre fondo oscuro ---------- */
+  --color-on-dark:      #cfc9c1;  /* texto sobre tinta */
+  --color-on-dark-mute: #a49d94;  /* secundario sobre tinta */
+
+  /* ---------- Líneas ---------- */
+  --color-line:      #d7d5d2;  /* hairline sobre papel */
+  --color-line-dark: #3d3a37;  /* hairline sobre tinta */
+}
+
+
+:root {
+  /* El diseño es solo claro. Sin esto, los controles nativos del
+     navegador (scrollbars, selects) se pintarían en oscuro si el
+     sistema está en modo noche, sobre un fondo que sigue siendo papel. */
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Quien haya pedido menos movimiento en su sistema no debería recibir
+   scroll animado. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink-soft);
+  /* Los titulares son enormes y de palo seco: sin suavizado se ven
+     engordados en pantallas Retina. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* La selección de texto en los colores de la casa en lugar del azul
+   del sistema. */
+::selection {
+  background-color: var(--color-amber);
+  color: var(--color-ink);
+}
+
+/* Foco visible con el rojo de la marca. El anillo por defecto del
+   navegador desaparece sobre los bloques de tinta, y sin foco visible
+   la web no se puede navegar con teclado. */
+:focus-visible {
+  outline: 3px solid var(--color-red);
+  outline-offset: 2px;
+}
