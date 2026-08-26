@@ -1,48 +1,41 @@
-import { useAuth } from './hooks/useAuth'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { useSession } from './hooks/useSession'
-import { useAdmins } from './hooks/useAdmins'
+import { useEsAdmin } from './hooks/useEsAdmin'
 import Login from './components/login'
+import Home from './pages/home'
+import Admins from './pages/admins'
 
 function App() {
-  const { session, cargando } = useSession()
+  const { session, cargando: cargandoSesion } = useSession()
+  const { esAdmin, cargando: cargandoAdmin } = useEsAdmin(session?.user.id)
 
-  if (cargando) return <p>Cargando…</p>
-  if (!session) return <Login />
-
-  return <Admins email={session.user.email ?? ''} />
-}
-
-function Admins({ email }: { email: string }) {
-  const { admins, loading, error } = useAdmins()
-  const { salir } = useAuth()
+  // Sin saber si hay sesión y si es admin no se puede decidir ninguna
+  // redirección: al recargar en /admins expulsaríamos a un admin legítimo.
+  if (cargandoSesion || cargandoAdmin) return <p>Cargando…</p>
 
   return (
-    <div className="p-6">
-      <div className="flex items-center gap-4 mb-4">
-        <h1 className="text-xl font-semibold">Admins</h1>
-        <span className="text-sm text-gray-600">{email}</span>
-        <button
-          onClick={salir}
-          className="text-sm underline"
-        >
-          Cerrar sesión
-        </button>
-      </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
 
-      {loading ? (
-        <p>Cargando…</p>
-      ) : error ? (
-        <p>Error: {error}</p>
-      ) : admins.length === 0 ? (
-        <p>No hay admins todavía.</p>
-      ) : (
-        <ul>
-          {admins.map((admin) => (
-            <li key={admin.id}>{admin.name}</li>
-          ))}
-        </ul>
-      )}
-    </div>
+        {/* Ya con sesión, /login no tiene sentido: reparte según el rol. */}
+        <Route
+          path="/login"
+          element={
+            session ? <Navigate to={esAdmin ? '/admins' : '/'} replace /> : <Login />
+          }
+        />
+
+        <Route
+          path="/admins"
+          element={
+            session && esAdmin ? <Admins /> : <Navigate to={session ? '/' : '/login'} replace />
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
