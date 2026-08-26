@@ -1,6 +1,6 @@
 import { SECCIONES, TELEFONO, TEL_HREF } from '../lib/datos'
 import { Marca, PAGE } from './ui'
-import { IconoTelefono } from './socialIcons'
+import IconoTelefono from './icon/telefono'
 
 /**
  * Cabecera: banda de tinta a todo el ancho con la marca, el menú y el

@@ -1,6 +1,7 @@
 import { DIRECCION, SECCIONES, TELEFONO, WHATSAPP } from '../lib/datos'
 import { BOTON_SOBRE_TINTA, Boton, Marca, PAGE } from './ui'
-import { IconoWhatsapp, SocialIcons } from './socialIcons'
+import { SocialIcons } from './socialIcons'
+import IconoWhatsapp from './icon/whatsapp'
 
 /**
  * Pie: marca, menú repetido, contacto y aviso legal.
