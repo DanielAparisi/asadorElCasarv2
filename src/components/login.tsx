@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
+import { useAuth } from '../hooks/useAuth'
 
 type Modo = 'login' | 'registro'
 
@@ -7,33 +7,17 @@ function Login() {
   const [modo, setModo] = useState<Modo>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [enviando, setEnviando] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [aviso, setAviso] = useState<string | null>(null)
+  const { registrar, entrar, enviando, error, aviso, limpiarMensajes } = useAuth()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setEnviando(true)
-    setError(null)
-    setAviso(null)
 
     if (modo === 'registro') {
-      const { data, error } = await supabase.auth.signUp({ email, password })
-
-      if (error) setError(error.message)
-      else if (!data.session) {
-        // El proyecto tiene la confirmación por email activada: hay usuario,
-        // pero no hay sesión hasta que se pulse el enlace del correo.
-        setAviso('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.')
-        setModo('login')
-      }
-      // Si data.session existe, onAuthStateChange en App se encarga del resto.
+      const creada = await registrar(email, password)
+      if (creada) setModo('login')
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) setError(error.message)
+      await entrar(email, password)
     }
-
-    setEnviando(false)
   }
 
   return (
@@ -86,8 +70,7 @@ function Login() {
             type="button"
             onClick={() => {
               setModo(modo === 'login' ? 'registro' : 'login')
-              setError(null)
-              setAviso(null)
+              limpiarMensajes()
             }}
             className="underline"
           >

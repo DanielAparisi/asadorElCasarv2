@@ -1,4 +1,4 @@
-import { supabase } from './lib/supabaseClient'
+import { useAuth } from './hooks/useAuth'
 import { useSession } from './hooks/useSession'
 import { useAdmins } from './hooks/useAdmins'
 import Login from './components/login'
@@ -14,6 +14,7 @@ function App() {
 
 function Admins({ email }: { email: string }) {
   const { admins, loading, error } = useAdmins()
+  const { salir } = useAuth()
 
   return (
     <div className="p-6">
@@ -21,7 +22,7 @@ function Admins({ email }: { email: string }) {
         <h1 className="text-xl font-semibold">Admins</h1>
         <span className="text-sm text-gray-600">{email}</span>
         <button
-          onClick={() => supabase.auth.signOut()}
+          onClick={salir}
           className="text-sm underline"
         >
           Cerrar sesión
