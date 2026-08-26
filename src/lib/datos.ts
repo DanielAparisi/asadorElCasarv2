@@ -5,8 +5,8 @@
  * aparecen en cabecera, pie y ubicación: repetirlos es garantizar que algún
  * día uno se quede sin actualizar.
  *
- * La carta y el horario acabarán saliendo de la base de datos (docs/panel.md,
- * fases 1 y 3). Hasta entonces viven aquí.
+ * La carta ya no está aquí: vive en lib/carta.json y se lee con useCarta().
+ * El horario acabará saliendo de la base de datos igual (docs/panel.md).
  */
 
 export const TELEFONO = '650 71 13 95'
@@ -29,14 +29,6 @@ export const SECCIONES = [
   { href: '#horario', texto: 'Horario' },
   { href: '#reservas', texto: 'Reservas' },
   { href: '#donde-estamos', texto: 'Dónde estamos' },
-]
-
-export const CARTA = [
-  { nombre: 'Pollo asado entero', precio: '12,00 €' },
-  { nombre: 'Medio pollo asado', precio: '6,50 €' },
-  { nombre: 'Costillas a la brasa', precio: '14,00 €' },
-  { nombre: 'Patatas fritas caseras', precio: '3,50 €' },
-  { nombre: 'Croquetas caseras (6 u.)', precio: '6,00 €' },
 ]
 
 const MEDIODIA = { etiqueta: 'Mediodía', horas: '13:00 – 16:00' }

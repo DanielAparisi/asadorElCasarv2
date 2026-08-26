@@ -1,4 +1,5 @@
-import { CARTA, HORARIO, PASOS, RECLAMOS, TELEFONO, TEL_HREF, WHATSAPP } from '../lib/datos'
+import { HORARIO, PASOS, RECLAMOS, TELEFONO, TEL_HREF, WHATSAPP } from '../lib/datos'
+import { formatearPrecio, useCarta } from '../hooks/useCarta'
 import {
   BLOQUE,
   BOTON_SOBRE_TINTA,
@@ -56,6 +57,8 @@ function Dia({
 }
 
 function Home() {
+  const { platos } = useCarta()
+
   return (
     <>
       <Header />
@@ -153,9 +156,9 @@ function Home() {
             </Titular>
 
             <ul className="m-0 p-0 list-none border-t-[3px] border-ink">
-              {CARTA.map((plato) => (
+              {platos.map((plato) => (
                 <li
-                  key={plato.nombre}
+                  key={plato.id}
                   className="flex items-baseline justify-between gap-4.5 px-1 py-3.75
                     border-b-[1.5px] border-ink last:border-b-[3px]"
                 >
@@ -163,7 +166,7 @@ function Home() {
                     {plato.nombre}
                   </span>
                   <span className="font-title text-[1.75rem] tracking-[0.02em] uppercase text-red whitespace-nowrap max-[560px]:text-[1.375rem]">
-                    {plato.precio}
+                    {formatearPrecio(plato.precio_centimos)}
                   </span>
                 </li>
               ))}
