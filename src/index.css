@@ -38,6 +38,35 @@
   --font-title: Anton, Haettenschweiler, "Arial Narrow Bold", Impact, sans-serif;
   --font-body:  "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
   --font-mono:  "Space Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+
+  /* ---------- Animaciones ----------
+     En Tailwind v4 las animaciones son tokens del tema, igual que los
+     colores: se declaran aquí y se usan como `animate-salto`. Los
+     @keyframes tienen que vivir dentro del @theme para que el token
+     resuelva. */
+
+  /* El bloque salta y su sombra se alarga: se despega del papel en lugar
+     de flotar con la sombra pegada. */
+  --animate-salto: salto 1.05s ease-in-out infinite;
+
+  @keyframes salto {
+    0%, 65%, 100% {
+      transform: translateY(0);
+      box-shadow: 4px 4px 0 var(--color-ink);
+    }
+    30% {
+      transform: translateY(-0.75rem);
+      box-shadow: 4px 10px 0 var(--color-ink);
+    }
+  }
+
+  /* Alternativa sin desplazamiento, para prefers-reduced-motion. */
+  --animate-latido: latido 1.4s ease-in-out infinite;
+
+  @keyframes latido {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.45; }
+  }
 }
 
 
