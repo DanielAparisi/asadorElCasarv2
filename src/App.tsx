@@ -1,9 +1,10 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { useSession } from './hooks/useSession'
 import { useEsAdmin } from './hooks/useEsAdmin'
-import Login from './components/login'
 import Home from './pages/home'
+import LoginPage from './pages/loginPage'
 import Admins from './pages/admins'
+import Page404 from './pages/404'
 
 function App() {
   const { session, cargando: cargandoSesion } = useSession()
@@ -22,18 +23,23 @@ function App() {
         <Route
           path="/login"
           element={
-            session ? <Navigate to={esAdmin ? '/admins' : '/'} replace /> : <Login />
+            session ? <Navigate to={esAdmin ? '/admins' : '/'} replace /> : <LoginPage />
           }
         />
 
+        {/* Quien no es admin va al 404, no a una página de "sin permiso":
+            así no se le confirma que la ruta existe. */}
         <Route
           path="/admins"
           element={
-            session && esAdmin ? <Admins /> : <Navigate to={session ? '/' : '/login'} replace />
+            session && esAdmin ? <Admins /> : <Navigate to={session ? '/404' : '/login'} replace />
           }
         />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/404" element={<Page404 />} />
+        {/* Se renderiza en su sitio, sin redirigir, para conservar la URL
+            que el usuario escribió. */}
+        <Route path="*" element={<Page404 />} />
       </Routes>
     </BrowserRouter>
   )
