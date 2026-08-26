@@ -1,27 +1,12 @@
-import { useEffect, useState } from 'react'
-import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabaseClient'
+import { useSession } from './hooks/useSession'
 import { useAdmins } from './hooks/useAdmins'
 import Login from './components/login'
 
 function App() {
-  const [session, setSession] = useState<Session | null>(null)
-  const [cargandoSesion, setCargandoSesion] = useState(true)
+  const { session, cargando } = useSession()
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
-      setCargandoSesion(false)
-    })
-
-    const { data: sub } = supabase.auth.onAuthStateChange((_evento, sesion) => {
-      setSession(sesion)
-    })
-
-    return () => sub.subscription.unsubscribe()
-  }, [])
-
-  if (cargandoSesion) return <p>Cargando…</p>
+  if (cargando) return <p>Cargando…</p>
   if (!session) return <Login />
 
   return <Admins email={session.user.email ?? ''} />
