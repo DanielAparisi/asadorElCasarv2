@@ -1,13 +1,14 @@
 import { useState } from 'react'
-import type { Session } from '@supabase/supabase-js'
-import { useAdmins } from '../hooks/useAdmins'
-import { useAuth } from '../hooks/useAuth'
+import { useAdmins } from '../../hooks/useAdmins'
 
-// La sesión llega por props: App ya la tiene y así no se abre una segunda
-// suscripción de auth para leer el correo.
-function Admins({ session }: { session: Session }) {
+/**
+ * Alta de admins. Era la página /admins entera antes de que el panel tuviera
+ * varias pantallas.
+ *
+ * El correo y el botón de salir ya no están aquí: los pinta el layout.
+ */
+function Equipo() {
   const { admins, loading, error, agregar, agregando, errorAlta } = useAdmins()
-  const { salir } = useAuth()
   const [correo, setCorreo] = useState('')
 
   async function handleAlta(e: React.FormEvent) {
@@ -17,14 +18,8 @@ function Admins({ session }: { session: Session }) {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center gap-4 mb-6">
-        <h1 className="text-xl font-semibold">Admins</h1>
-        <span className="text-sm text-gray-600">{session.user.email}</span>
-        <button onClick={salir} className="text-sm underline">
-          Cerrar sesión
-        </button>
-      </div>
+    <div>
+      <h1 className="text-xl font-semibold mb-6">Equipo</h1>
 
       {loading ? (
         <p>Cargando…</p>
@@ -54,7 +49,7 @@ function Admins({ session }: { session: Session }) {
             value={correo}
             onChange={(e) => setCorreo(e.target.value)}
             placeholder="correo@ejemplo.com"
-            className="border border-gray-300 rounded px-3 py-2 flex-1"
+            className="border border-gray-300 rounded px-3 py-2 flex-1 bg-white"
           />
           <button
             type="submit"
@@ -71,4 +66,4 @@ function Admins({ session }: { session: Session }) {
   )
 }
 
-export default Admins
+export default Equipo

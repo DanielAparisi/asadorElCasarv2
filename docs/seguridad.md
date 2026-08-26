@@ -143,18 +143,32 @@ Supabase. Es donde más seguridad se gana por minuto invertido:
 
 ---
 
-## Lo que falta y no es menor
+## Revocar el acceso: decisión tomada
 
-**No hay forma de quitarle el admin a nadie.** Existe `agregar_admin()`, pero no
-su contraria. Si un socio se va, o si una cuenta se ve comprometida, hoy la única
-salida es entrar al SQL Editor de Supabase y borrar la fila a mano.
+Existe `agregar_admin()` pero no su contraria. **Se ha decidido no construirla**:
+con tres o cuatro dueños, quitarle el admin a alguien es algo que pasará una vez
+cada varios años, y no compensa el código y la interfaz que requiere.
 
-Poder **revocar** el acceso es tan parte del control de accesos como poder
-concederlo, y en una emergencia el tiempo cuenta. Falta una `quitar_admin()` con
-dos protecciones: que un admin no pueda quitarse a sí mismo (evita quedarse sin
-ningún admin por error) y confirmación explícita en la interfaz.
+La contrapartida es que **revocar es un procedimiento manual** y hay que saber
+hacerlo *antes* de necesitarlo, no durante una urgencia. Desde el SQL Editor de
+Supabase:
 
----
+```sql
+-- Ver quién es admin ahora mismo
+select a.id, a.name, u.email
+from public."Admins" a join auth.users u on u.id = a.user_id;
+
+-- Quitarle el admin a alguien (la cuenta sigue existiendo, pierde el panel)
+delete from public."Admins" where user_id = '<el uuid de arriba>';
+```
+
+Si la cuenta está comprometida, no basta con quitarle el admin: hay que cerrarle
+las sesiones abiertas, porque su token sigue siendo válido hasta que caduque.
+Eso se hace desde el dashboard, en Authentication → Users → la cuenta → cerrar
+sesiones, o cambiándole la contraseña.
+
+**Cuándo reconsiderarlo:** si el número de admins pasa de cinco, o si alguna vez
+hay que revocar con prisa y el procedimiento manual resulta incómodo.
 
 ## Lo que NO conviene hacer
 
