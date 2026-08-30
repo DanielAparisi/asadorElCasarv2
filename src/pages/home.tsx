@@ -16,18 +16,6 @@ import Schedule from '../components/schedule'
 import UbicationSection from '../components/ubicationSection'
 import Footer from '../components/footer'
 
-/* ============================================================
-   Carta pública — conversión del diseño de
-   github.com/DanielAparisi/asadorElCasar (index.html + styles.css).
-
-   Este archivo es el montaje: qué secciones hay y en qué orden. El contenido
-   de cada una vive en components/.
-
-   Sobre los breakpoints: el diseño original es desktop-first, con cortes en
-   900px y 560px. Se conservan tal cual con `max-[900px]:` y `max-[560px]:`
-   para poder compararlo línea a línea con el CSS de origen y no tocar los
-   breakpoints por defecto de Tailwind, que usa el panel de admin.
-   ============================================================ */
 
 function Home() {
   const { platos } = useCarta()
