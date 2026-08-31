@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import logo from '../assets/logo.jpg'
 
 /**
@@ -140,7 +141,11 @@ export function Entradilla({
 /** Logo + nombre. Aparece en la cabecera y, algo más pequeño, en el pie. */
 export function Marca({ pie = false }: { pie?: boolean }) {
   return (
-    <a href="#" className="flex items-center gap-3.5">
+    // `Link` y no `href="#"`: el ancla vacía no llevaba a ningún sitio, solo
+    // dejaba un `#` colgando en la URL. Hoy la marca solo se pinta en `/`, así
+    // que se notaba poco; en cuanto la cabecera o el pie aparezcan en otra
+    // ruta, pulsar el logo tiene que volver al inicio.
+    <Link to="/" className="flex items-center gap-3.5">
       <img
         src={logo}
         alt="Logo Asador El Casar"
@@ -153,6 +158,6 @@ export function Marca({ pie = false }: { pie?: boolean }) {
       >
         Asador El Casar
       </span>
-    </a>
+    </Link>
   )
 }

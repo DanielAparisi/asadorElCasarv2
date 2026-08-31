@@ -42,7 +42,10 @@ export function formatearPrecio(centimos: number) {
 // En Supabase esto será un `.order('orden')` en la consulta.
 const categorias: Categoria[] = [...carta.categorias].sort((a, b) => a.orden - b.orden)
 
-const platos: Plato[] = (carta.platos as Plato[])
+// Sin `as Plato[]`: así TypeScript comprueba de verdad que el JSON tiene la
+// forma de la tabla. El cast anterior tapaba que a los platos les faltaba
+// `orden`, y el .sort() acababa comparando undefined.
+const platos: Plato[] = carta.platos
   // Los no disponibles no salen en la carta pública. En Supabase lo hará la
   // política de RLS, que además impide siquiera leerlos.
   .filter((plato) => plato.disponible)

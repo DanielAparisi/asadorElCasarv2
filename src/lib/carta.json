@@ -11,6 +11,7 @@
       "descripcion": "Criado en corral, hecho despacio a la brasa de encina.",
       "precio_centimos": 1200,
       "categoria_id": 1,
+      "orden": 1,
       "disponible": true
     },
     {
@@ -19,6 +20,7 @@
       "descripcion": "",
       "precio_centimos": 650,
       "categoria_id": 1,
+      "orden": 2,
       "disponible": true
     },
     {
@@ -27,7 +29,7 @@
       "descripcion": "Costilla de cerdo marinada 24 horas.",
       "precio_centimos": 1400,
       "categoria_id": 1,
-   
+      "orden": 3,
       "disponible": true
     },
     {
@@ -36,6 +38,7 @@
       "descripcion": "",
       "precio_centimos": 350,
       "categoria_id": 2,
+      "orden": 1,
       "disponible": true
     },
     {
@@ -44,6 +47,7 @@
       "descripcion": "De jamón, hechas cada mañana.",
       "precio_centimos": 600,
       "categoria_id": 2,
+      "orden": 2,
       "disponible": true
     },
     {
@@ -52,6 +56,7 @@
       "descripcion": "Fuera de carta hasta la próxima temporada.",
       "precio_centimos": 500,
       "categoria_id": 2,
+      "orden": 3,
       "disponible": false
     }
   ]
