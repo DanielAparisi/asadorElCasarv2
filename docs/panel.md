@@ -51,6 +51,27 @@ Estructura de rutas a la que se tiende:
 
 ## 2. Modelo de datos
 
+> **Nota (31/08/2026).** Desde el paso del código a inglés, las tablas y
+> columnas de esta sección se crean con nombres en inglés. La equivalencia con
+> lo que se lee más abajo es directa:
+>
+> | en este documento | nombre real |
+> |---|---|
+> | `categorias` | `categories` |
+> | `platos` | `dishes` |
+> | `nombre` | `name` |
+> | `descripcion` | `description` |
+> | `precio_centimos` | `price_cents` |
+> | `categoria_id` | `category_id` |
+> | `orden` | `sort_order` (`order` es palabra reservada en SQL) |
+> | `disponible` | `available` |
+> | `foto_path` | `photo_path` |
+>
+> Los tipos de `src/features/menu/types.ts` ya usan estos nombres. La tabla
+> `Admins` no cambia. La función `agregar_admin(correo)` pasó a ser
+> `add_admin(email)` en `supabase/migrations/admins_rename_add_admin.sql`.
+
+
 ### Vocabulario
 
 No son *recetas*, son **platos de la carta**. Una receta son ingredientes y

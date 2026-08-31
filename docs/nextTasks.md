@@ -7,6 +7,14 @@ no la gravedad aislada de cada punto.
 Estado del repo en el momento de escribir esto: `npm run build` pasa (469 kB /
 135 kB gzip en un único chunk) y `npm run lint` sale limpio.
 
+> **Actualización 31/08/2026.** Hechas las tareas 1, 2, 3, 5, 6 y 7. Además, el
+> código se pasó entero a inglés y se reorganizó por dominios
+> (`features/` + `shared/`), así que las rutas de archivo citadas más abajo en
+> las tareas pendientes son las de antes del refactor. La equivalencia está en
+> el README. Queda pendiente aplicar
+> `supabase/migrations/admins_rename_add_admin.sql` en el SQL Editor: el
+> cliente ya llama a `add_admin`.
+
 Las tres primeras son media mañana entre las tres. La 8 es la que convierte el
 panel en algo realmente usable.
 
@@ -139,7 +147,7 @@ No había ningún uso de `PRIVATE_API_KEY` en el código.
 - [x] `Marca` usa `href="#"` (`src/components/ui.tsx:147`): desde `/404` no
       vuelve al inicio. Debería ser `<Link to="/">`
 - [ ] **PENDIENTE** — Quitar el aviso «Precios de ejemplo — sustituir por los
-      reales» (`src/pages/home.tsx:73`) cuando los precios sean los buenos
+      reales» (`src/features/landing/components/MenuSection.tsx`) cuando los precios sean los buenos
 
 Se deja puesto a propósito: los precios de `carta.json` siguen siendo de
 ejemplo (pollo entero a 12,00 €). Quitar el aviso antes que los precios falsos
@@ -157,13 +165,14 @@ Tres de las cuatro páginas del panel (`resumen`, `platoNuevo`, `platoEditar`,
 `categorias`) son stubs esperando estas tablas. `docs/panel.md` §2 y §3 ya traen
 el DDL y el molde de políticas.
 
-- [ ] Crear `categorias` y `platos` con el esquema de `docs/panel.md` §2
-- [ ] Índice en `platos(categoria_id)` — Postgres no lo crea solo
+- [ ] Crear `categories` y `dishes` con el esquema de `docs/panel.md` §2 — ojo
+      a la nota de nombres en inglés al principio de esa sección
+- [ ] Índice en `dishes(category_id)` — Postgres no lo crea solo
 - [ ] Las dos políticas del molde: lectura pública de lo disponible, escritura
       solo admin
 - [ ] `revoke` explícito por tabla, como se hizo con `Admins`
-- [ ] Cambiar `useCarta()` de JSON a Supabase — el cambio se queda dentro de ese
-      archivo, ningún componente se toca
+- [ ] Cambiar `useMenu()` de JSON a Supabase — el cambio se queda dentro de
+      `src/features/menu/hooks/useMenu.ts`, ningún componente se toca
 - [ ] Rellenar las páginas stub del panel
 
 Dos trampas documentadas en `docs/panel.md` §3 que conviene tener delante:
@@ -185,10 +194,12 @@ Los archivos de `supabase/migrations/` no llevan prefijo de timestamp, así que
 `supabase db push` no los reconoce y se aplican pegándolos a mano en el SQL
 Editor.
 
-- [ ] Renombrar los cuatro archivos existentes con prefijo de timestamp
+- [ ] Renombrar los cinco archivos existentes con prefijo de timestamp (el
+      contenido de los cuatro antiguos se deja tal cual: son el registro de lo
+      que ya está aplicado en la base de datos)
 - [ ] Pasar a usar el CLI para las siguientes
 
-Hacerlo ahora que son cuatro, no cuando sean diez.
+Hacerlo ahora que son cinco, no cuando sean diez.
 
 ---
 
@@ -198,6 +209,6 @@ Hacerlo ahora que son cuatro, no cuando sean diez.
 
 Hoy cualquier `throw` en render deja pantalla en blanco sin ninguna pista.
 
-- [ ] `ErrorBoundary` envolviendo `<Routes>` en `src/App.tsx`
+- [ ] `ErrorBoundary` envolviendo `<Routes>` en `src/app/App.tsx`
 - [ ] Workflow de GitHub Actions que corra `npm run lint && npm run build` en
       cada PR

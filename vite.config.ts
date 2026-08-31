@@ -3,40 +3,40 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 /**
- * Inyecta la Content-Security-Policy en el HTML del build.
+ * Injects the Content-Security-Policy into the built HTML.
  *
- * Solo en producción: en desarrollo Vite necesita websockets e inline scripts
- * para el HMR, y una CSP estricta lo rompería.
+ * Production only: in development Vite needs websockets and inline scripts for
+ * HMR, and a strict CSP would break it.
  *
- * Es una segunda línea de defensa. La primera es que React escapa todo lo que
- * interpola, así que un XSS necesitaría un `dangerouslySetInnerHTML` o un
- * `href` con `javascript:`. La CSP existe para el día en que alguien introduzca
- * uno de los dos sin darse cuenta: aunque se inyecte un script, el navegador se
- * niega a ejecutarlo.
+ * This is a second line of defence. The first is that React escapes everything
+ * it interpolates, so an XSS would need a `dangerouslySetInnerHTML` or a
+ * `javascript:` href. The CSP exists for the day someone introduces one of the
+ * two without noticing: even if a script is injected, the browser refuses to
+ * run it.
  *
- * Importa más de lo que parece porque supabase-js guarda el token de sesión en
- * localStorage: un XSS en esta app no es un `alert()`, es robar la sesión de un
- * admin y con ella la capacidad de escribir en la base de datos.
+ * It matters more than it looks because supabase-js keeps the session token in
+ * localStorage: an XSS in this app is not an `alert()`, it is stealing an
+ * admin's session and with it the ability to write to the database.
  */
 function cspPlugin(supabaseUrl: string): Plugin {
-  const directivas = [
+  const directives = [
     "default-src 'self'",
     "base-uri 'self'",
     "object-src 'none'",
-    // Sin 'unsafe-inline' ni 'unsafe-eval': lo que de verdad frena un XSS.
+    // No 'unsafe-inline' and no 'unsafe-eval': this is what actually stops XSS.
     "script-src 'self'",
-    // Tailwind compila a un archivo, pero React inyecta estilos inline en
-    // algunos casos. El riesgo de un estilo inline es mucho menor.
-    // googleapis: la hoja de estilos de Google Fonts (Anton, Space Grotesk,
-    // Space Mono). Sin esto el navegador la bloquea y cae la tipografía.
+    // Tailwind compiles to a file, but React injects inline styles in some
+    // cases. The risk of an inline style is far lower.
+    // googleapis: the Google Fonts stylesheet (Anton, Space Grotesk, Space
+    // Mono). Without it the browser blocks it and the typography falls back.
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    // blob: y data: para previsualizar fotos antes de subirlas a Storage.
+    // blob: and data: to preview photos before uploading them to Storage.
     `img-src 'self' data: blob: ${supabaseUrl}`,
-    // gstatic: los archivos .woff2 que sirve Google Fonts.
+    // gstatic: the .woff2 files Google Fonts serves.
     "font-src 'self' data: https://fonts.gstatic.com",
-    // Único destino de red permitido: Supabase. wss para Realtime.
+    // The only network destination allowed: Supabase. wss for Realtime.
     `connect-src 'self' ${supabaseUrl} ${supabaseUrl.replace('https://', 'wss://')}`,
-    // Un formulario inyectado no puede enviar credenciales a otro dominio.
+    // An injected form cannot post credentials to another domain.
     "form-action 'self'",
     "frame-src 'none'",
     'upgrade-insecure-requests',
@@ -53,7 +53,7 @@ function cspPlugin(supabaseUrl: string): Plugin {
             tag: 'meta',
             attrs: {
               'http-equiv': 'Content-Security-Policy',
-              content: directivas.join('; '),
+              content: directives.join('; '),
             },
             injectTo: 'head-prepend',
           },

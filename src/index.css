@@ -1,55 +1,55 @@
 @import "tailwindcss";
 
-/* `static` obliga a Tailwind a emitir TODOS los tokens al CSS final. Sin esa
-   palabra elimina los que ningún utility usa todavía, y `var(--color-cream)`
-   escrito a mano no resolvería. La paleta es la referencia del proyecto:
-   tiene que estar entera aunque aún no se use. Cuesta unos 400 bytes. */
+/* `static` forces Tailwind to emit ALL tokens into the final CSS. Without that
+   keyword it drops the ones no utility uses yet, and a hand-written
+   `var(--color-cream)` would not resolve. The palette is the reference for the
+   project: it has to be complete even where it is not used yet. Costs about
+   400 bytes. */
 @theme static {
-  /* ---------- Superficies ---------- */
-  --color-bg:         #f4f1ea;  /* papel cálido, fondo de todo */
-  --color-cream:      #fdf6e6;  /* trama de los huecos de foto */
-  --color-cream-alt:  #f4ecd8;  /* segunda trama, para alternar */
-  --color-card:       #fffdf7;  /* fichas sobre el papel */
-  --color-white:      #ffffff;  /* texto sobre rojo y sobre tinta */
+  /* ---------- Surfaces ---------- */
+  --color-bg:         #f4f1ea;  /* warm paper, the background of everything */
+  --color-cream:      #fdf6e6;  /* hatch of the photo placeholders */
+  --color-cream-alt:  #f4ecd8;  /* second hatch, to alternate with */
+  --color-card:       #fffdf7;  /* cards sitting on the paper */
+  --color-white:      #ffffff;  /* text on red and on ink */
 
-  /* ---------- Tinta ---------- */
-  --color-ink:        #16130f;  /* bloques, bordes y titulares */
-  --color-ink-soft:   #3d3a37;  /* párrafos */
-  --color-ink-mute:   #716c65;  /* notas y placeholders (ver nota 1) */
+  /* ---------- Ink ---------- */
+  --color-ink:        #16130f;  /* blocks, borders and headings */
+  --color-ink-soft:   #3d3a37;  /* body copy */
+  --color-ink-mute:   #716c65;  /* notes and placeholders (see note 1) */
 
-  /* ---------- Acentos ---------- */
-  --color-red:        #e02b20;  /* el del logo. Fondo, no texto (nota 2) */
-  --color-red-dark:   #b31f16;  /* hover, y el rojo válido para texto */
-  --color-amber:      #f2b53c;  /* destacados. Siempre como fondo (nota 3) */
-  --color-amber-dark: #e5a72c;  /* su hover */
+  /* ---------- Accents ---------- */
+  --color-red:        #e02b20;  /* the logo red. Background, not text (note 2) */
+  --color-red-dark:   #b31f16;  /* hover, and the red that is legal for text */
+  --color-amber:      #f2b53c;  /* highlights. Always as a background (note 3) */
+  --color-amber-dark: #e5a72c;  /* its hover */
 
-  /* ---------- Sobre fondo oscuro ---------- */
-  --color-on-dark:      #cfc9c1;  /* texto sobre tinta */
-  --color-on-dark-mute: #a49d94;  /* secundario sobre tinta */
+  /* ---------- On dark backgrounds ---------- */
+  --color-on-dark:      #cfc9c1;  /* text on ink */
+  --color-on-dark-mute: #a49d94;  /* secondary text on ink */
 
-  /* ---------- Líneas ---------- */
-  --color-line:      #d7d5d2;  /* hairline sobre papel */
-  --color-line-dark: #3d3a37;  /* hairline sobre tinta */
+  /* ---------- Rules ---------- */
+  --color-line:      #d7d5d2;  /* hairline on paper */
+  --color-line-dark: #3d3a37;  /* hairline on ink */
 
-  /* ---------- Tipografía ----------
-     Del repo de diseño. Se cargan desde Google Fonts en index.html; los
-     fallbacks son condensadas de sistema para que el titular no se
-     ensanche mientras llega Anton. */
+  /* ---------- Typography ----------
+     From the design repo. Loaded from Google Fonts in index.html; the
+     fallbacks are condensed system faces so the headline does not widen
+     while Anton is still on the wire. */
   --font-title: Anton, Haettenschweiler, "Arial Narrow Bold", Impact, sans-serif;
   --font-body:  "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
   --font-mono:  "Space Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 
-  /* ---------- Animaciones ----------
-     En Tailwind v4 las animaciones son tokens del tema, igual que los
-     colores: se declaran aquí y se usan como `animate-salto`. Los
-     @keyframes tienen que vivir dentro del @theme para que el token
-     resuelva. */
+  /* ---------- Animations ----------
+     In Tailwind v4 animations are theme tokens, just like colours: they are
+     declared here and used as `animate-jump`. The @keyframes have to live
+     inside @theme for the token to resolve. */
 
-  /* El bloque salta y su sombra se alarga: se despega del papel en lugar
-     de flotar con la sombra pegada. */
-  --animate-salto: salto 1.05s ease-in-out infinite;
+  /* The block jumps and its shadow stretches: it lifts off the paper instead
+     of floating with the shadow stuck to it. */
+  --animate-jump: jump 1.05s ease-in-out infinite;
 
-  @keyframes salto {
+  @keyframes jump {
     0%, 65%, 100% {
       transform: translateY(0);
       box-shadow: 4px 4px 0 var(--color-ink);
@@ -60,10 +60,10 @@
     }
   }
 
-  /* Alternativa sin desplazamiento, para prefers-reduced-motion. */
-  --animate-latido: latido 1.4s ease-in-out infinite;
+  /* Motion-free alternative, for prefers-reduced-motion. */
+  --animate-heartbeat: heartbeat 1.4s ease-in-out infinite;
 
-  @keyframes latido {
+  @keyframes heartbeat {
     0%, 100% { opacity: 1; }
     50%      { opacity: 0.45; }
   }
@@ -71,9 +71,9 @@
 
 
 :root {
-  /* El diseño es solo claro. Sin esto, los controles nativos del
-     navegador (scrollbars, selects) se pintarían en oscuro si el
-     sistema está en modo noche, sobre un fondo que sigue siendo papel. */
+  /* The design is light-only. Without this, native browser controls
+     (scrollbars, selects) would paint dark when the system is in night
+     mode, on a background that is still paper. */
   color-scheme: light;
 }
 
@@ -81,8 +81,8 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Quien haya pedido menos movimiento en su sistema no debería recibir
-   scroll animado. */
+/* Anyone who asked for reduced motion in their system should not get
+   animated scrolling. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -95,22 +95,21 @@ body {
   font-family: var(--font-body);
   font-size: 1.0625rem; /* 17px */
   line-height: 1.6;
-  /* Los titulares son enormes y de palo seco: sin suavizado se ven
-     engordados en pantallas Retina. */
+  /* The headings are huge and grotesque: without smoothing they look
+     fattened on Retina screens. */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* La selección de texto en los colores de la casa en lugar del azul
-   del sistema. */
+/* Text selection in the house colours instead of the system blue. */
 ::selection {
   background-color: var(--color-amber);
   color: var(--color-ink);
 }
 
-/* Foco visible con el rojo de la marca. El anillo por defecto del
-   navegador desaparece sobre los bloques de tinta, y sin foco visible
-   la web no se puede navegar con teclado. */
+/* Visible focus in the brand red. The browser default ring disappears
+   against the ink blocks, and without a visible focus the site cannot be
+   navigated by keyboard. */
 :focus-visible {
   outline: 3px solid var(--color-red);
   outline-offset: 2px;
