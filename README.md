@@ -59,6 +59,7 @@ queda para lo genuinamente compartido entre features.
 
 ## Documentación
 
+- `docs/arquitectura.md` — **cómo está montado el proyecto y por qué**
 - `docs/panel.md` — decisiones de diseño del panel y del modelo de datos
 - `docs/nextTasks.md` — trabajo pendiente por orden de prioridad
 - `docs/seguridad.md` — notas de seguridad
