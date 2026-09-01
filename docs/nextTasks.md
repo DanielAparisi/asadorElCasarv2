@@ -12,8 +12,12 @@ Estado del repo en el momento de escribir esto: `npm run build` pasa (469 kB /
 > (`features/` + `shared/`), así que las rutas de archivo citadas más abajo en
 > las tareas pendientes son las de antes del refactor. La equivalencia está en
 > el README. Queda pendiente aplicar
-> `supabase/migrations/admins_rename_add_admin.sql` en el SQL Editor: el
-> cliente ya llama a `add_admin`.
+> `supabase/migrations/20260831093559_admins_rename_add_admin.sql` en el SQL
+> Editor: el cliente ya llama a `add_admin`.
+>
+> **Actualización 01/09/2026.** Hechas también las tareas 9 y 10. Quedan
+> pendientes la 4 (despliegue), la 8 (tablas `dishes`/`categories`) y el aviso
+> de precios de la 7.
 
 Las tres primeras son media mañana entre las tres. La 8 es la que convierte el
 panel en algo realmente usable.
@@ -186,29 +190,70 @@ Dos trampas documentadas en `docs/panel.md` §3 que conviene tener delante:
 
 ---
 
-## 9. Renombrar las migraciones a `<timestamp>_nombre.sql`
+## 9. Renombrar las migraciones a `<timestamp>_nombre.sql` — ✅ HECHO (01/09/2026)
 
 **~20 min · deuda que crece**
 
-Los archivos de `supabase/migrations/` no llevan prefijo de timestamp, así que
-`supabase db push` no los reconoce y se aplican pegándolos a mano en el SQL
+Los archivos de `supabase/migrations/` no llevaban prefijo de timestamp, así que
+`supabase db push` no los reconocía y se aplicaban pegándolos a mano en el SQL
 Editor.
 
-- [ ] Renombrar los cinco archivos existentes con prefijo de timestamp (el
-      contenido de los cuatro antiguos se deja tal cual: son el registro de lo
-      que ya está aplicado en la base de datos)
-- [ ] Pasar a usar el CLI para las siguientes
+- [x] Renombrar los cinco archivos existentes con prefijo de timestamp (el
+      contenido se deja tal cual: son el registro de lo que ya está aplicado en
+      la base de datos)
+- [x] Pasar a usar el CLI para las siguientes
 
-Hacerlo ahora que son cinco, no cuando sean diez.
+El timestamp de cada archivo es la fecha **UTC del commit que lo introdujo**, no
+la de hoy: así el orden alfabético que lee el CLI es el orden real en que se
+aplicaron a la base de datos. Los dos primeros recuperan el prefijo que ya
+tuvieron en su commit original.
+
+| archivo | de |
+|---|---|
+| `20260825235901_admins_rls.sql` | `admins_rls.sql` |
+| `20260826000258_admins_signup_trigger.sql` | `admins_signup_trigger.sql` |
+| `20260826094521_admins_aprobacion_manual.sql` | `admins_aprobacion_manual.sql` |
+| `20260826100433_seguridad_permisos_por_defecto.sql` | `seguridad_permisos_por_defecto.sql` |
+| `20260831093559_admins_rename_add_admin.sql` | `admins_rename_add_admin.sql` |
+
+Hechos con `git mv`, para que el historial siga cada archivo. Actualizadas las
+referencias en `README.md`, `docs/arquitectura.md`, `docs/seguridad.md` y
+`docs/panel.md`.
+
+⚠️ Renombrar no marca nada como aplicado: la tabla `supabase_migrations` del
+proyecto remoto sigue vacía, porque las cuatro primeras se pegaron a mano. Antes
+del primer `supabase db push` hay que sincronizar el historial
+(`supabase migration repair --status applied <version>` por cada una ya
+aplicada), o el CLI intentará ejecutarlas otra vez.
 
 ---
 
-## 10. Error boundary y CI
+## 10. Error boundary y CI — ✅ HECHO (01/09/2026)
 
 **~1 h · red de seguridad**
 
-Hoy cualquier `throw` en render deja pantalla en blanco sin ninguna pista.
+Cualquier `throw` en render dejaba pantalla en blanco sin ninguna pista.
 
-- [ ] `ErrorBoundary` envolviendo `<Routes>` en `src/app/App.tsx`
-- [ ] Workflow de GitHub Actions que corra `npm run lint && npm run build` en
+- [x] `ErrorBoundary` envolviendo `<Routes>` en `src/app/App.tsx`
+- [x] Workflow de GitHub Actions que corra `npm run lint && npm run build` en
       cada PR
+
+`src/shared/components/ErrorBoundary.tsx` es una clase porque React solo da
+`getDerivedStateFromError` / `componentDidCatch` a componentes de clase. Va
+dentro de `<BrowserRouter>` (para tener contexto de router) y fuera de
+`<Suspense>`, así que cubre también los fallos de carga de los chunks lazy del
+panel. Pinta un bloque en el lenguaje visual de la casa con un botón de recarga
+—recarga completa, no navegación: tras un error el árbol de React ya no es de
+fiar— y deja el `componentStack` en consola, que es el único rastro que queda en
+producción.
+
+No captura errores de handlers, `setTimeout` ni promesas rechazadas: React nunca
+se los pasa a un boundary. Eso es límite de React, no del componente.
+
+`.github/workflows/ci.yml` corre en cada PR y en push a `main`: `npm ci`,
+`npm run lint`, `npm run build`. No hay paso de tests porque todavía no hay
+tests, y `npm run build` ya ejecuta `tsc -b`, así que los errores de tipos
+también rompen el CI. El build corre **sin** las variables `VITE_SUPABASE_*`, a
+propósito: comprueba que la app compila sin ellas.
+
+Coste en el chunk público: +1,2 kB (+0,3 kB gzip), 255,2 kB / 80,8 kB gzip.

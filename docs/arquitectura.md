@@ -455,10 +455,11 @@ Las rutas y las anclas se quedan en español a propósito: son direcciones que e
 usuario ve en la barra y que romperían enlaces guardados. Están centralizadas
 en `app/App.tsx` y `landing/content.ts` por si algún día se cambia de idea.
 
-Las cuatro migraciones SQL anteriores a `admins_rename_add_admin.sql` conservan
-sus nombres y comentarios en español: son el registro de lo que ya está
-aplicado en la base de datos, y reescribirlas haría que dejaran de describir la
-realidad.
+Las cuatro migraciones SQL anteriores a `20260831093559_admins_rename_add_admin.sql`
+conservan sus nombres y comentarios en español: son el registro de lo que ya
+está aplicado en la base de datos, y reescribirlas haría que dejaran de
+describir la realidad. Todas llevan delante el prefijo de timestamp UTC que
+espera `supabase db push`, tomado de la fecha del commit que las creó.
 
 ---
 

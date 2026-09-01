@@ -50,7 +50,7 @@ owner. Activarlo rompería el alta de admins.
 
 ### Capa 2 — Permisos de Postgres
 
-Estado: **arreglado** en `seguridad_permisos_por_defecto.sql`.
+Estado: **arreglado** en `20260826100433_seguridad_permisos_por_defecto.sql`.
 
 El proyecto arrastraba unos `alter default privileges` que concedían
 `insert/update/delete` a `anon` sobre **toda tabla futura** de `public`. El RLS

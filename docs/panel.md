@@ -69,7 +69,8 @@ Estructura de rutas a la que se tiende:
 >
 > Los tipos de `src/features/menu/types.ts` ya usan estos nombres. La tabla
 > `Admins` no cambia. La función `agregar_admin(correo)` pasó a ser
-> `add_admin(email)` en `supabase/migrations/admins_rename_add_admin.sql`.
+> `add_admin(email)` en
+> `supabase/migrations/20260831093559_admins_rename_add_admin.sql`.
 
 
 ### Vocabulario
@@ -258,7 +259,8 @@ Cada fase deja algo funcionando y visible. Nada de construir tres capas antes de
 ver un plato en pantalla.
 
 **Fase 0 — cerrar el acceso** *(hecho, pendiente de aplicar)*
-Migración `admins_aprobacion_manual.sql`: fuera el trigger de alta automática,
+Migración `20260826094521_admins_aprobacion_manual.sql`: fuera el trigger de alta
+automática,
 permisos revocados, `agregar_admin()` en su sitio.
 ⚠️ Antes de aplicarla, comprobar que hay al menos una fila en `Admins`; si la
 tabla está vacía, nadie podrá volver a entrar nunca.

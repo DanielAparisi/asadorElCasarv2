@@ -63,4 +63,5 @@ queda para lo genuinamente compartido entre features.
 - `docs/panel.md` — decisiones de diseño del panel y del modelo de datos
 - `docs/nextTasks.md` — trabajo pendiente por orden de prioridad
 - `docs/seguridad.md` — notas de seguridad
-- `supabase/migrations/` — SQL, aplicado a mano desde el SQL Editor
+- `supabase/migrations/` — SQL con prefijo `<timestamp>_`, listo para
+  `supabase db push` (lo aplicado hasta hoy se pegó a mano en el SQL Editor)

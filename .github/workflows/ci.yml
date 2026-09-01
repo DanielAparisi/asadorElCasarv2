@@ -1,0 +1,31 @@
+# Runs the same two commands the project is checked with locally, on every PR
+# and on pushes to main. Nothing else: there are no tests yet, and `npm run
+# build` already runs `tsc -b`, so type errors fail here too.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` and not `npm install`: it installs exactly the lockfile, so a
+      # green CI means the same dependency tree everyone else has.
+      - run: npm ci
+
+      - run: npm run lint
+
+      # The build reads VITE_SUPABASE_* from the environment. They are absent
+      # here on purpose: they are public anon values, the build does not need
+      # to reach Supabase, and this checks the app compiles without them.
+      - run: npm run build
