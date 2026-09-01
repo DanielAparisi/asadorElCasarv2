@@ -17,7 +17,11 @@ Estado del repo en el momento de escribir esto: `npm run build` pasa (469 kB /
 >
 > **Actualización 01/09/2026.** Hechas también las tareas 9 y 10. Quedan
 > pendientes la 4 (despliegue), la 8 (tablas `dishes`/`categories`) y el aviso
-> de precios de la 7.
+> de precios de la 7, que cae solo al hacer la 8. Son unas 5 h en total.
+>
+> La 8 se ha desglosado en siete partes (8.1–8.7) porque era la única que no
+> cabía en un rato: cada una deja el repo compilando y algo que enseñar, y el
+> orden entre ellas no es negociable.
 
 Las tres primeras son media mañana entre las tres. La 8 es la que convierte el
 panel en algo realmente usable.
@@ -161,32 +165,216 @@ con los precios del asador.
 
 ---
 
-## 8. Las tablas `platos` y `categorias`
+## 8. La carta desde Supabase — el desbloqueo real
 
-**~medio día · el desbloqueo real**
+**~5 h repartidas en 7 partes · cada una deja algo que funciona**
 
-Tres de las cuatro páginas del panel (`resumen`, `platoNuevo`, `platoEditar`,
-`categorias`) son stubs esperando estas tablas. `docs/panel.md` §2 y §3 ya traen
-el DDL y el molde de políticas.
+Tres de las cuatro páginas del panel (`DishesPage`, `NewDishPage`,
+`EditDishPage`, `CategoriesPage`) son stubs de ~20 líneas esperando estas
+tablas. `docs/panel.md` §2 y §3 traen el DDL y el molde de políticas; esto es el
+mismo trabajo partido en trozos que se pueden hacer en ratos sueltos.
 
-- [ ] Crear `categories` y `dishes` con el esquema de `docs/panel.md` §2 — ojo
-      a la nota de nombres en inglés al principio de esa sección
-- [ ] Índice en `dishes(category_id)` — Postgres no lo crea solo
-- [ ] Las dos políticas del molde: lectura pública de lo disponible, escritura
-      solo admin
-- [ ] `revoke` explícito por tabla, como se hizo con `Admins`
-- [ ] Cambiar `useMenu()` de JSON a Supabase — el cambio se queda dentro de
-      `src/features/menu/hooks/useMenu.ts`, ningún componente se toca
-- [ ] Rellenar las páginas stub del panel
+**El orden importa y no es negociable.** Cada parte se apoya en la anterior y
+deja el repo en un estado que compila y se puede enseñar. No empezar la 8.4 sin
+haber visto la carta pública leyendo de la base de datos.
 
-Dos trampas documentadas en `docs/panel.md` §3 que conviene tener delante:
+**La buena noticia antes de empezar.** Tres cosas ya están montadas y ahorran la
+mitad del trabajo:
 
+- `menu/types.ts` ya declara exactamente las columnas de las tablas futuras.
+- `useMenu()` ya devuelve `{ dishes, categories, loading, error }` aunque hoy
+  lea un JSON síncrono. Los componentes de la landing ya contemplan la espera,
+  así que **ningún componente público se toca** en la 8.3.
+- `TeamPage` + `useAdmins` ya son un CRUD real contra Supabase con RLS. Son el
+  molde de todo lo que viene: no se empieza de cero, se copia un patrón que ya
+  funciona en este repo.
+
+---
+
+### 8.1 Las dos tablas
+
+**~45 min · sin esto no hay nada**
+
+Una migración nueva, `<timestamp>_menu_tables.sql`, con todo lo de esta parte
+junto: el DDL, los índices, las políticas y los grants. Que sea un solo archivo
+importa — una tabla sin sus políticas está rota (ver la trampa de abajo), así que
+no deben poder aplicarse por separado.
+
+- [ ] `categories`: `id bigint identity`, `name text not null`,
+      `sort_order integer not null default 0`
+- [ ] `dishes`: `id`, `name`, `description text not null default ''`,
+      `price_cents integer not null`, `category_id bigint references categories
+      on delete restrict`, `sort_order`, `available boolean not null default
+      true`, `photo_path text`, `created_at`/`updated_at timestamptz`
+- [ ] Índice en `dishes(category_id)` — toda foránea que se filtre necesita el
+      suyo, Postgres no lo crea solo
+- [ ] Las dos políticas del molde en **cada** tabla: lectura pública
+      (`using (available)` en `dishes`, `using (true)` en `categories`),
+      escritura solo `is_admin()`
+- [ ] `revoke all` + grants explícitos por tabla, igual que se hizo con `Admins`
+- [ ] Aplicarla y comprobar desde el SQL Editor que existe
+
+Nombres **en inglés**, según la nota del principio de `docs/panel.md` §2. El
+documento los escribe en español en las tablas de columnas; la equivalencia está
+ahí mismo.
+
+⚠️ `price_cents` es `integer` de céntimos, nunca `float`. 18,50 no existe en
+binario y acabas con platos a 18,499999.
+
+⚠️ `categories` **no** lleva `using (available)`: no tiene esa columna. Copiar el
+molde a ciegas es el error fácil aquí.
+
+⚠️ Dos trampas de este repo documentadas en `docs/panel.md` §3:
 1. El event trigger `ensure_rls` activa RLS en toda tabla nueva → una tabla
-   recién creada devuelve **cero filas** hasta que tiene políticas. No está
+   recién creada devuelve **cero filas** hasta que tiene políticas. Insertas
+   tres platos, haces el `select` desde la app y ves una lista vacía. No está
    rota; le faltan las políticas.
 2. Los `alter default privileges` de la primera migración conceden
    `insert/update/delete` a `anon` sobre toda tabla futura de `public`. El RLS
-   lo tapa, pero deja una sola capa de defensa.
+   lo tapa, pero deja una sola capa de defensa. De ahí el `revoke` explícito.
+
+---
+
+### 8.2 Los datos reales dentro
+
+**~30 min · la parte que no es código**
+
+- [ ] Seed con las categorías y platos **reales del asador**, con sus precios
+      buenos, insertado desde el SQL Editor
+- [ ] Dejar al menos un plato con `available = false`, para poder verificar en
+      la 8.3 que el filtro funciona de verdad
+- [ ] Guardar el `insert` como `supabase/seed.sql` (o dentro de la migración de
+      la 8.1 si es poca cosa)
+
+`src/features/menu/data/menu.json` sirve de plantilla del formato, pero **sus
+datos son de ejemplo** — pollo entero a 12,00 €. Esta es la parte que hay que
+pedirle al asador, y por eso conviene pedírsela ya: es la única de las siete que
+depende de otra persona y puede tardar días en llegar.
+
+---
+
+### 8.3 `useMenu()` deja de leer el JSON
+
+**~45 min · aquí la carta pública ya sale de la base de datos**
+
+- [ ] Cambiar `useMenu()` a dos `select` de Supabase con `.order('sort_order')`
+- [ ] `useEffect` + `AbortController` en la limpieza, igual que `useAdmins`
+- [ ] `loading` pasa a ser de verdad `true` al principio; `error` deja de ser
+      siempre `null`
+- [ ] Comprobar en la web que el plato con `available = false` **no** aparece
+- [ ] Borrar `src/features/menu/data/menu.json`
+
+El cambio se queda **dentro de `src/features/menu/hooks/useMenu.ts`**. Ningún
+componente se toca: la firma de retorno ya es la definitiva.
+
+Dos cosas que hoy hace el hook y pasan a hacerse en SQL: el `.filter(available)`
+lo hará la política RLS (ni siquiera llegan al cliente) y los dos `.sort()` los
+hará `.order()`. Cuidado con el orden compuesto de `dishes`: hoy es
+`category_id` y luego `sort_order`, que en Supabase son dos `.order()`
+encadenados.
+
+⚠️ Verificar el estado de carga de verdad, no solo que "se ve la carta". En
+local con caché caliente el `loading` dura 20 ms y no se distingue de síncrono.
+Con el throttling de red del navegador se ve si hay un salto de layout.
+
+**Punto de parada natural.** Aquí ya hay algo que enseñar a los dueños y es lo
+que de verdad ve el cliente. Si la 8.2 trae los precios buenos, aquí también
+**cae solo el aviso de precios de ejemplo de la tarea 7**.
+
+---
+
+### 8.4 `useDishes()`: el hook de escritura
+
+**~1 h · el corazón del panel**
+
+Un hook nuevo en `src/features/admin/hooks/useDishes.ts`, calcado de
+`useAdmins`: mismo `useEffect` + `useState` + `loading`/`error`, mismo
+`AbortController`, mismos estados separados para la mutación en curso.
+
+- [ ] `dishes` — la lista **completa**, incluidos los no disponibles (el panel
+      los tiene que ver; la landing no)
+- [ ] `createDish(dish)`, `updateDish(id, changes)`, `toggleAvailable(id)`
+- [ ] `deleteDish(id)` — existe, pero se usa en la 8.6 escondido tras
+      confirmación
+- [ ] Un hook hermano `useCategories()` para el desplegable de categoría y para
+      la 8.7
+
+⚠️ La diferencia con `useMenu()` es que aquí `available` no filtra. Si el hook
+del panel oculta los platos no disponibles, no hay forma de volver a ponerlos en
+la carta — el botón de la 8.5 se vuelve un viaje sin retorno.
+
+⚠️ Ojo a la invalidación, ya avisada en `docs/panel.md` §4: editas un precio en
+`/admins/platos/7`, vuelves a la lista y la lista muestra el precio viejo porque
+su `useEffect` no se ha vuelto a ejecutar. Se resuelve a mano actualizando el
+estado local con la fila que devuelve el `update`, como hace
+`useAdmins.addAdmin`. **No meter TanStack Query aquí**: con tres pantallas se
+paga la dependencia sin cobrar el beneficio.
+
+---
+
+### 8.5 `DishesPage`: la lista
+
+**~1 h · la pantalla que van a usar a diario**
+
+- [ ] Tabla de platos agrupados por categoría, con nombre, precio formateado
+      con `formatPrice()` y enlace a editar
+- [ ] Interruptor **en carta / fuera de carta** por fila, que llama a
+      `toggleAvailable` — es lo que más van a tocar y tiene que estar a un clic,
+      sin entrar a editar
+- [ ] Los platos fuera de carta se ven, atenuados, no se esconden
+- [ ] Estados de `loading`, `error` y lista vacía, como en `TeamPage`
+
+Sin florituras de diseño: **el panel puede ser feo, la carta no**
+(`docs/panel.md`, principio 2). Estilo el de `TeamPage`, que es Tailwind gris y
+directo.
+
+---
+
+### 8.6 El formulario: alta y edición
+
+**~1 h · dos páginas, un componente**
+
+- [ ] `DishForm` en `src/features/admin/components/`, con `input`, `textarea` y
+      un `select` de categorías. Sin editor enriquecido (`docs/panel.md` §6)
+- [ ] `NewDishPage` lo monta con valores vacíos
+- [ ] `EditDishPage` carga el plato por el `id` de la ruta y se lo pasa como
+      valores iniciales. Si el id no existe, **404, no un formulario vacío**
+- [ ] El precio se teclea en euros («12,50») y se guarda en céntimos. La
+      conversión, en un solo sitio junto a `formatPrice`
+- [ ] Borrar de verdad: escondido, con confirmación, en la página de edición y
+      no en la lista
+
+Un solo `DishForm` para las dos páginas es lo que evita que los dos formularios
+se separen con el tiempo — hoy `NewDishPage` y `EditDishPage` ya tienen el
+comentario puesto.
+
+⚠️ El `on delete restrict` de `category_id` significa que borrar una categoría
+con platos dentro **falla con un error de Postgres**, no borra en cascada. Es a
+propósito (nada de huérfanos), pero el mensaje que llega es feo: hay que
+traducirlo a algo legible en la 8.7.
+
+⚠️ El parseo del precio es el punto sucio: «12,50», «12.50» y «12,5» tienen que
+dar todos 1250. Coma decimal española, que `parseFloat` no entiende.
+
+---
+
+### 8.7 `CategoriesPage` y el orden
+
+**~45 min · lo último, y lo más fácil de recortar**
+
+- [ ] Lista editable de categorías: nombre y `sort_order` como campo numérico
+- [ ] Alta y borrado de categoría, con el error de `restrict` traducido
+- [ ] `sort_order` de los platos editable desde `DishForm`
+
+**Nada de arrastrar y soltar.** Un campo numérico editable resuelve el 90 % del
+problema; el drag and drop, solo si lo piden después de usarlo un mes.
+
+---
+
+**Fuera de esta tarea, a propósito:** las fotos de los platos (`photo_path` se
+crea en la 8.1 pero se queda vacío). Storage, subida, redimensionado en cliente
+y reemplazo son la fase 5 de `docs/panel.md` §5, la parte más fiddly, y no
+bloquean nada de lo de arriba.
 
 ---
 
