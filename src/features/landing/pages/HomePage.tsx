@@ -27,11 +27,15 @@ function HomePage() {
       <MarqueeBand />
 
       <div className={PAGE_CONTAINER}>
-        {/* The menu and the about column share one two-column block. */}
-        <section className="grid grid-cols-[1.15fr_1fr] gap-14 pt-16 max-[900px]:grid-cols-1 max-[900px]:gap-11 max-[900px]:pt-12">
-          <MenuSection />
+        {/* "About us" no longer shares a row with the menu: since every dish
+            carries a photo, the menu takes the full width. Its copy keeps a
+            reading width of its own — a paragraph 1120 px wide is a paragraph
+            nobody finishes. */}
+        <section className="pt-16 max-w-[46rem] max-[900px]:pt-12">
           <AboutSection />
         </section>
+
+        <MenuSection />
 
         <GallerySection />
         <ScheduleSection />

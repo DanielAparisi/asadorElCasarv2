@@ -40,7 +40,7 @@ export function useMenu() {
           .abortSignal(controller.signal),
         supabase
           .from('dishes')
-          .select('id, name, description, price_cents, category_id, sort_order, available')
+          .select('id, name, description, price_cents, category_id, sort_order, available, photo_path')
           .order('sort_order')
           .abortSignal(controller.signal),
       ])

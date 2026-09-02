@@ -232,6 +232,13 @@ de verdad, y deja de hacer falta pasar `userId` a mano a `useEsAdmin`.
 
 ## 5. Fotos de los platos
 
+> **Estado (02/09/2026).** El lado de la carta pública ya está hecho: la carta
+> es una cuadrícula con una foto por plato, `photo_path` viaja en la consulta y
+> `menu/dishPhoto.ts` sabe construir la URL pública. Mientras no haya foto se
+> pinta el marco de trama diagonal, que ocupa exactamente lo mismo, así que
+> subir la primera foto no mueve la maquetación. **Falta todo lo demás de esta
+> sección**: el bucket, sus políticas y la subida desde el panel.
+
 Van a **Supabase Storage**, bucket público `platos/`. En la tabla se guarda solo
 la ruta (`foto_path`), no la URL completa: si cambia el dominio del proyecto, las
 URLs guardadas se rompen y las rutas no.

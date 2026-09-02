@@ -21,4 +21,6 @@ export type Dish = {
   category_id: number
   sort_order: number
   available: boolean
+  /** Path inside the Storage bucket, not a full URL. Null until it has one. */
+  photo_path: string | null
 }

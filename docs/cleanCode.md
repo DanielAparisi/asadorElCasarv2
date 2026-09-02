@@ -43,11 +43,15 @@ solo se aplica en la build es una configuración que no se prueba nunca. Cuando
 se haga la tarea 4 (despliegue), el `npm run preview` tiene que entrar en la
 rutina antes de cada release.
 
-### 0.2 `MenuSection` ignora las categorías — 🟡 A MEDIAS (02/09/2026)
+### 0.2 `MenuSection` ignora las categorías — ✅ HECHO (02/09/2026)
 
-> `loading` y `error` ya se pintan: al hacer la 8.3 se vio que sin eso un fallo
-> de red dejaba la carta vacía y muda para siempre. **Sigue pendiente lo otro**:
-> la carta pública mapea los platos en una lista plana y no usa `categories`.
+> En dos pasos, y el segundo no estaba previsto aquí. Primero `loading` y
+> `error`, al hacer la 8.3: sin ellos un fallo de red dejaba la carta vacía y
+> muda para siempre. Después las categorías, al pasar la carta a cuadrícula con
+> una foto por plato — que es justo lo que anticipaba el párrafo de abajo: con
+> tarjetas anchas, cuarenta platos seguidos sin separador dejan de ser una
+> hipótesis. Cada categoría lleva su encabezado, y una categoría cuyos platos
+> están todos fuera de carta no pinta nada, en vez de un título huérfano.
 
 `useMenu()` devuelve `{ dishes, categories, loading, error }`.
 `MenuSection.tsx:14` desestructura solo `dishes` y pinta una lista plana. Hoy
@@ -105,8 +109,8 @@ Precisamente por eso su estilo tiene que estar en un solo sitio — si algún d�
 se decide que deje de ser feo, es un archivo, no doce.
 
 **Cuándo NO extraer.** Una clase larga que aparece **una vez** se queda en el
-JSX. `MenuSection` tiene `className` de cinco líneas y está bien: describen ese
-sitio y solo ese. La señal para extraer es la **tercera** repetición, no la
+JSX. `MenuSection` y `DishCard` tienen `className` de varias líneas y están
+bien: describen ese sitio y solo ese. La señal para extraer es la **tercera** repetición, no la
 segunda.
 
 ---
@@ -323,7 +327,7 @@ Nada de esto es urgente salvo lo primero. Lo que no cabe en un rato, no se hace.
 | 5 | `"strict": true` explícito | ya, es una línea | 1 min |
 | 6 | Comprobar las variables de entorno | ya | 5 min |
 | 2 | Alias `@/` | antes de la tarea 8 | 10 min |
-| 0.2 | 🟡 `MenuSection`: `loading` y `error` hechos, faltan las categorías | cuando se toque la carta | 10 min |
+| 0.2 | ✅ `MenuSection`: categorías, `loading` y `error` | hecho el 02/09/2026 | |
 | 1 | ✅ `AdminInput` / `AdminButton` / `AdminHeading` | hecho el 02/09/2026 | |
 | 8 | Prettier en el CI | cuando toque el CI | 15 min |
 

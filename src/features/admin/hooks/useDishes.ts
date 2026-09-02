@@ -12,7 +12,8 @@ export type DishInput = {
   available: boolean
 }
 
-const COLUMNS = 'id, name, description, price_cents, category_id, sort_order, available'
+const COLUMNS =
+  'id, name, description, price_cents, category_id, sort_order, available, photo_path'
 
 /**
  * The dishes, for the panel.

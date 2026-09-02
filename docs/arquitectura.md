@@ -104,7 +104,8 @@ components/
   SiteHeader.tsx            banda de tinta: marca, menú, teléfono
   HeroSection.tsx           el único <h1> de la web
   MarqueeBand.tsx           banda roja de reclamos (aria-hidden)
-  MenuSection.tsx           lista de precios ← useMenu()
+  MenuSection.tsx           la carta en cuadrícula, por categorías ← useMenu()
+  DishCard.tsx              un plato: foto (o su marco), nombre y precio
   AboutSection.tsx          "sobre nosotros"
   GallerySection.tsx        3 huecos de foto con rotaciones distintas
   ScheduleSection.tsx       horario semanal, 8 celdas
@@ -127,6 +128,7 @@ sección.
 ```
 types.ts           Dish y Category = columnas de las tablas de Supabase
 formatPrice.ts     1250 ↔ "12,50 €" / "12,50" (los dos sentidos)
+dishPhoto.ts       photo_path → URL pública del bucket (sin bucket todavía)
 hooks/useMenu.ts   la única puerta a los datos de la carta
 ```
 

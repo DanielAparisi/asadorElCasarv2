@@ -1,27 +1,32 @@
-import { formatPrice } from '../../menu/formatPrice'
 import { useMenu } from '../../menu/hooks/useMenu'
 import { Heading } from '../../../shared/components/ui/Heading'
 import { Tag } from '../../../shared/components/ui/Tag'
+import DishCard from './DishCard'
 
 /**
- * The public menu: a price list, one row per dish.
+ * The public menu: a grid of dishes with a photo, grouped by category.
  *
- * It brings neither the grid nor the width: whoever places it decides that,
- * which is what lets the page be reordered without touching the section.
+ * It used to be a flat price list in a narrow column. With a photo per dish it
+ * needs the full width, and the categories stop being decoration: without a
+ * heading between them, four categories are forty cards in a row with nothing
+ * separating them (docs/cleanCode.md §0.2).
+ *
+ * It brings neither the width nor the container: whoever places it decides
+ * that, which is what lets the page be reordered without touching the section.
  */
 function MenuSection() {
-  const { dishes, loading, error } = useMenu()
+  const { dishes, categories, loading, error } = useMenu()
 
   return (
-    <div id="la-carta" className="scroll-mt-6">
+    <section id="la-carta" className="pt-16 scroll-mt-6 max-[900px]:pt-12">
       <Tag>La carta</Tag>
-      <Heading className="mt-5 mb-6 text-[3.75rem] leading-[0.94] max-[900px]:text-[2.75rem] max-[560px]:text-[2.375rem]">
+      <Heading className="mt-5 mb-9 text-[3.75rem] leading-[0.94] max-[900px]:text-[2.75rem] max-[560px]:text-[2.375rem]">
         Nuestros clásicos
       </Heading>
 
       {/* Since useMenu reads from Supabase, the wait and the failure are real:
           without these two branches a network error leaves the menu blank for
-          ever and says nothing (docs/cleanCode.md §0.2). */}
+          ever and says nothing. */}
       {loading ? (
         <p className="font-mono text-xs tracking-[0.04em] text-ink-mute">Cargando la carta…</p>
       ) : error ? (
@@ -29,29 +34,33 @@ function MenuSection() {
           No hemos podido cargar la carta ahora mismo. Llámanos y te la contamos.
         </p>
       ) : (
-        <ul className="m-0 p-0 list-none border-t-[3px] border-ink">
-          {dishes.map((dish) => (
-            <li
-              key={dish.id}
-              className="flex items-baseline justify-between gap-4.5 px-1 py-3.75
-                border-b-[1.5px] border-ink last:border-b-[3px]"
-            >
-              <span className="font-title text-[1.75rem] tracking-[0.02em] uppercase text-ink max-[560px]:text-[1.375rem]">
-                {dish.name}
-              </span>
-              <span className="font-title text-[1.75rem] tracking-[0.02em] uppercase text-red whitespace-nowrap max-[560px]:text-[1.375rem]">
-                {formatPrice(dish.price_cents)}
-              </span>
-            </li>
-          ))}
-        </ul>
+        categories.map((category) => {
+          const dishesOfCategory = dishes.filter((dish) => dish.category_id === category.id)
+          // An empty category is a category whose dishes are all off the menu:
+          // its heading alone would look like something failed to load.
+          if (dishesOfCategory.length === 0) return null
+
+          return (
+            <div key={category.id} className="mb-14 last:mb-0 max-[900px]:mb-11">
+              <h3 className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-ink border-t-[3px] border-ink pt-3 mb-7">
+                {category.name}
+              </h3>
+
+              <ul className="grid grid-cols-3 gap-x-6.5 gap-y-11 m-0 p-0 list-none max-[900px]:grid-cols-2 max-[900px]:gap-y-9 max-[560px]:grid-cols-1">
+                {dishesOfCategory.map((dish) => (
+                  <DishCard key={dish.id} dish={dish} />
+                ))}
+              </ul>
+            </div>
+          )
+        })
       )}
 
-      {/* Placeholder notice: it comes out with the real prices, in phase 1. */}
-      <p className="mt-4 font-mono text-xs tracking-[0.04em] text-ink-mute">
+      {/* Placeholder notice: it comes out with the real prices, in task 8.2. */}
+      <p className="mt-9 font-mono text-xs tracking-[0.04em] text-ink-mute">
         Precios de ejemplo — sustituir por los reales.
       </p>
-    </div>
+    </section>
   )
 }
 

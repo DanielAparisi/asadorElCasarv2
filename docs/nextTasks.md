@@ -190,8 +190,11 @@ con los precios del asador.
 > 3. **Sí se tocó un componente público en la 8.3**: `MenuSection` pintaba
 >    `dishes.map()` sin mirar `loading` ni `error`, con lo que un fallo de red
 >    dejaba la carta vacía para siempre y sin decirlo — el problema que
->    `docs/cleanCode.md` §0.2 ya tenía anotado. Sigue pendiente la otra mitad de
->    esa nota: agrupar la carta pública por categorías.
+>    `docs/cleanCode.md` §0.2 ya tenía anotado. Después se reescribió entero:
+>    la carta de la portada es ahora una cuadrícula a ancho completo, agrupada
+>    por categorías, con una foto por plato (`DishCard`). Mientras no haya
+>    fotos se pinta el marco de trama diagonal de la galería, que mide lo
+>    mismo. La subida de fotos sigue siendo la fase 5 de `docs/panel.md`.
 > 4. **El `db push` arrastró tres migraciones anteriores** que estaban sin
 >    registrar. Dos ya estaban aplicadas a mano y volver a aplicarlas no cambió
 >    nada, pero la del renombrado (`20260831093559`) **no lo estaba**: en

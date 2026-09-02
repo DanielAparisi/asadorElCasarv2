@@ -4,7 +4,7 @@ import { Tag } from '../../../shared/components/ui/Tag'
 import { POSTER_BORDER } from '../../../shared/components/ui/tokens'
 
 /**
- * "About us": the right-hand column of the block it shares with the menu.
+ * "About us": the block that opens the page under the marquee band.
  *
  * It brings neither the grid nor the width: whoever places it decides that,
  * which is what lets the page be reordered without touching the section.
