@@ -3,7 +3,6 @@ import HeroSection from '../components/HeroSection'
 import MarqueeBand from '../components/MarqueeBand'
 import MenuSection from '../components/MenuSection'
 import AboutSection from '../components/AboutSection'
-import GallerySection from '../components/GallerySection'
 import ScheduleSection from '../components/ScheduleSection'
 import OrderSection from '../components/OrderSection'
 import LocationSection from '../components/LocationSection'
@@ -37,7 +36,6 @@ function HomePage() {
 
         <MenuSection />
 
-        <GallerySection />
         <ScheduleSection />
         <OrderSection />
         <LocationSection />

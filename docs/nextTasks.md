@@ -193,8 +193,7 @@ con los precios del asador.
 >    `docs/cleanCode.md` §0.2 ya tenía anotado. Después se reescribió entero:
 >    la carta de la portada es ahora una cuadrícula a ancho completo, agrupada
 >    por categorías, con una foto por plato (`DishCard`). Mientras no haya
->    fotos se pinta el marco de trama diagonal de la galería, que mide lo
->    mismo. La subida de fotos sigue siendo la fase 5 de `docs/panel.md`.
+>    fotos se pinta un marco de trama diagonal que mide lo mismo. La subida de fotos sigue siendo la fase 5 de `docs/panel.md`.
 > 4. **El `db push` arrastró tres migraciones anteriores** que estaban sin
 >    registrar. Dos ya estaban aplicadas a mano y volver a aplicarlas no cambió
 >    nada, pero la del renombrado (`20260831093559`) **no lo estaba**: en

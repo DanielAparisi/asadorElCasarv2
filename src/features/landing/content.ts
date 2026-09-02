@@ -28,7 +28,6 @@ export const FACEBOOK_URL = 'https://facebook.com/asadorelcasar'
 /** In-page navigation links. Shared by the header and the footer. */
 export const NAV_LINKS = [
   { href: '#la-carta', label: 'La carta' },
-  { href: '#fotos', label: 'Fotos' },
   { href: '#horario', label: 'Horario' },
   { href: '#reservas', label: 'Reservas' },
   { href: '#donde-estamos', label: 'Dónde estamos' },

@@ -107,7 +107,6 @@ components/
   MenuSection.tsx           la carta en cuadrícula, por categorías ← useMenu()
   DishCard.tsx              un plato: foto (o su marco), nombre y precio
   AboutSection.tsx          "sobre nosotros"
-  GallerySection.tsx        3 huecos de foto con rotaciones distintas
   ScheduleSection.tsx       horario semanal, 8 celdas
   OrderSection.tsx          bloque de tinta: reservas y los 3 pasos
   LocationSection.tsx       datos + iframe de Google Maps (lazy)
