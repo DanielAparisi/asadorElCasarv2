@@ -173,10 +173,21 @@ grant insert, update, delete on table public.platos to authenticated;
 
 ### Convención de migraciones
 
-Los archivos de `supabase/migrations/` no llevan prefijo de timestamp, así que
-`supabase db push` no los reconoce: se aplican pegándolos en el SQL Editor. O se
-mantiene esa costumbre, o se renombran todos a `<timestamp>_nombre.sql` y se pasa
-a usar el CLI. Lo que no conviene es mezclar las dos cosas.
+> **Actualizado (02/09/2026).** Ya no es así: la tarea 9 renombró todos los
+> archivos a `<timestamp>_nombre.sql` y desde la tarea 8 se aplican con
+> `supabase db push --linked`, que además registra lo aplicado en
+> `supabase_migrations.schema_migrations`.
+>
+> El precio de haber mezclado las dos costumbres se cobró al hacer la 8.1: tres
+> migraciones aplicadas a mano desde el SQL Editor no constaban como aplicadas,
+> y una de ellas —el renombrado de `agregar_admin` a `add_admin`— resultó que no
+> se había aplicado nunca, con el front ya llamando al nombre nuevo. Desde aquí,
+> **una sola vía**: el CLI. Nada de pegar SQL en el editor.
+
+Lo que sigue vale como historia de por qué:
+
+~~Los archivos de `supabase/migrations/` no llevan prefijo de timestamp, así que
+`supabase db push` no los reconoce: se aplican pegándolos en el SQL Editor.~~
 
 ---
 
@@ -265,22 +276,23 @@ permisos revocados, `agregar_admin()` en su sitio.
 ⚠️ Antes de aplicarla, comprobar que hay al menos una fila en `Admins`; si la
 tabla está vacía, nadie podrá volver a entrar nunca.
 
-**Fase 1 — los datos**
-`categorias` y `platos` con políticas, grants y índices. Tres o cuatro platos
-reales metidos a mano desde el SQL Editor para tener con qué trabajar.
+**Fase 1 — los datos** *(hecho el 02/09/2026)*
+`categories` y `dishes` con políticas, grants e índice, en
+`20260902204529_menu_tables.sql`. Los platos que hay dentro son todavía los de
+ejemplo: faltan los reales del asador (tarea 8.2 de `docs/nextTasks.md`).
 
-**Fase 2 — la carta pública**
-`/carta` leyendo de la base de datos. Sin panel todavía. Aquí ya hay algo que
-enseñar a los dueños, y es la parte que de verdad ve el cliente.
+**Fase 2 — la carta pública** *(hecho el 02/09/2026)*
+La carta de `/` lee de la base de datos desde `useMenu()`. El plato no
+disponible no llega siquiera al cliente: lo filtra la política de RLS.
 
-**Fase 3 — el CRUD**
-Layout del panel con guard en el padre, lista de platos, alta, edición,
-disponible/no disponible. Todo con `textarea` e `input`, sin florituras.
+**Fase 3 — el CRUD** *(hecho el 02/09/2026)*
+`useDishes`/`useCategories` y las cuatro pantallas del panel. Del `delete` real
+solo hay un botón, escondido en la edición y con confirmación.
 
-**Fase 4 — el orden**
-Reordenar categorías y platos. Empezar con un campo numérico `orden` editable a
-mano; el arrastrar y soltar solo si lo piden.
+**Fase 4 — el orden** *(hecho el 02/09/2026)*
+`sort_order` editable como número, en `CategoriesPage` y en `DishForm`. Sin
+arrastrar y soltar, como estaba decidido.
 
-**Fase 5 — las fotos**
+**Fase 5 — las fotos** *(pendiente, lo único que queda)*
 Storage, subida, redimensionado, reemplazo. Es la parte más fiddly: va al final
 a propósito.

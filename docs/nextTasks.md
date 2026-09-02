@@ -165,9 +165,39 @@ con los precios del asador.
 
 ---
 
-## 8. La carta desde Supabase — el desbloqueo real
+## 8. La carta desde Supabase — ✅ HECHO salvo los datos reales (02/09/2026)
 
 **~5 h repartidas en 7 partes · cada una deja algo que funciona**
+
+> **Estado (02/09/2026).** 8.1 y de la 8.3 a la 8.7 están hechas y aplicadas
+> contra el proyecto de Supabase (`supabase db push`). Queda pendiente **la
+> 8.2**: la carta que hay dentro son todavía los datos de ejemplo del antiguo
+> `menu.json`, así que el aviso de «precios de ejemplo» de la tarea 7 sigue
+> puesto. Cuando lleguen los precios del asador se cambian las filas y cae el
+> aviso.
+>
+> Cuatro cosas salieron distintas de como están escritas más abajo, y gana la
+> realidad:
+>
+> 1. **El seed vive dentro de la migración**, no en `supabase/seed.sql`:
+>    `supabase db push` aplica migraciones y no seeds, y una carta vacía no se
+>    le puede enseñar a nadie. Los `insert` van guardados con `not exists`, así
+>    que la migración se puede volver a aplicar.
+> 2. **`useMenu()` no ordena por `category_id`.** Ese era un orden válido
+>    mientras los ids venían de un JSON escrito a mano; la base de datos los
+>    asigna según entran las filas y «Para picar» acabó siendo el id 1 y
+>    «Brasa» el 2. Lo que ordena la carta es `categories.sort_order`.
+> 3. **Sí se tocó un componente público en la 8.3**: `MenuSection` pintaba
+>    `dishes.map()` sin mirar `loading` ni `error`, con lo que un fallo de red
+>    dejaba la carta vacía para siempre y sin decirlo — el problema que
+>    `docs/cleanCode.md` §0.2 ya tenía anotado. Sigue pendiente la otra mitad de
+>    esa nota: agrupar la carta pública por categorías.
+> 4. **El `db push` arrastró tres migraciones anteriores** que estaban sin
+>    registrar. Dos ya estaban aplicadas a mano y volver a aplicarlas no cambió
+>    nada, pero la del renombrado (`20260831093559`) **no lo estaba**: en
+>    producción existía `agregar_admin` y no `add_admin`, así que dar de alta a
+>    un admin estaba roto desde el despliegue del front. Ahora funciona.
+
 
 Tres de las cuatro páginas del panel (`DishesPage`, `NewDishPage`,
 `EditDishPage`, `CategoriesPage`) son stubs de ~20 líneas esperando estas
@@ -200,19 +230,19 @@ junto: el DDL, los índices, las políticas y los grants. Que sea un solo archiv
 importa — una tabla sin sus políticas está rota (ver la trampa de abajo), así que
 no deben poder aplicarse por separado.
 
-- [ ] `categories`: `id bigint identity`, `name text not null`,
+- [x] `categories`: `id bigint identity`, `name text not null`,
       `sort_order integer not null default 0`
-- [ ] `dishes`: `id`, `name`, `description text not null default ''`,
+- [x] `dishes`: `id`, `name`, `description text not null default ''`,
       `price_cents integer not null`, `category_id bigint references categories
       on delete restrict`, `sort_order`, `available boolean not null default
       true`, `photo_path text`, `created_at`/`updated_at timestamptz`
-- [ ] Índice en `dishes(category_id)` — toda foránea que se filtre necesita el
+- [x] Índice en `dishes(category_id)` — toda foránea que se filtre necesita el
       suyo, Postgres no lo crea solo
-- [ ] Las dos políticas del molde en **cada** tabla: lectura pública
+- [x] Las dos políticas del molde en **cada** tabla: lectura pública
       (`using (available)` en `dishes`, `using (true)` en `categories`),
       escritura solo `is_admin()`
-- [ ] `revoke all` + grants explícitos por tabla, igual que se hizo con `Admins`
-- [ ] Aplicarla y comprobar desde el SQL Editor que existe
+- [x] `revoke all` + grants explícitos por tabla, igual que se hizo con `Admins`
+- [x] Aplicarla y comprobar desde el SQL Editor que existe
 
 Nombres **en inglés**, según la nota del principio de `docs/panel.md` §2. El
 documento los escribe en español en las tablas de columnas; la equivalencia está
@@ -241,9 +271,9 @@ molde a ciegas es el error fácil aquí.
 
 - [ ] Seed con las categorías y platos **reales del asador**, con sus precios
       buenos, insertado desde el SQL Editor
-- [ ] Dejar al menos un plato con `available = false`, para poder verificar en
+- [x] Dejar al menos un plato con `available = false`, para poder verificar en
       la 8.3 que el filtro funciona de verdad
-- [ ] Guardar el `insert` como `supabase/seed.sql` (o dentro de la migración de
+- [x] Guardar el `insert` como `supabase/seed.sql` (o dentro de la migración de
       la 8.1 si es poca cosa)
 
 `src/features/menu/data/menu.json` sirve de plantilla del formato, pero **sus
@@ -257,12 +287,12 @@ depende de otra persona y puede tardar días en llegar.
 
 **~45 min · aquí la carta pública ya sale de la base de datos**
 
-- [ ] Cambiar `useMenu()` a dos `select` de Supabase con `.order('sort_order')`
-- [ ] `useEffect` + `AbortController` en la limpieza, igual que `useAdmins`
-- [ ] `loading` pasa a ser de verdad `true` al principio; `error` deja de ser
+- [x] Cambiar `useMenu()` a dos `select` de Supabase con `.order('sort_order')`
+- [x] `useEffect` + `AbortController` en la limpieza, igual que `useAdmins`
+- [x] `loading` pasa a ser de verdad `true` al principio; `error` deja de ser
       siempre `null`
-- [ ] Comprobar en la web que el plato con `available = false` **no** aparece
-- [ ] Borrar `src/features/menu/data/menu.json`
+- [x] Comprobar en la web que el plato con `available = false` **no** aparece
+- [x] Borrar `src/features/menu/data/menu.json`
 
 El cambio se queda **dentro de `src/features/menu/hooks/useMenu.ts`**. Ningún
 componente se toca: la firma de retorno ya es la definitiva.
@@ -291,12 +321,12 @@ Un hook nuevo en `src/features/admin/hooks/useDishes.ts`, calcado de
 `useAdmins`: mismo `useEffect` + `useState` + `loading`/`error`, mismo
 `AbortController`, mismos estados separados para la mutación en curso.
 
-- [ ] `dishes` — la lista **completa**, incluidos los no disponibles (el panel
+- [x] `dishes` — la lista **completa**, incluidos los no disponibles (el panel
       los tiene que ver; la landing no)
-- [ ] `createDish(dish)`, `updateDish(id, changes)`, `toggleAvailable(id)`
-- [ ] `deleteDish(id)` — existe, pero se usa en la 8.6 escondido tras
+- [x] `createDish(dish)`, `updateDish(id, changes)`, `toggleAvailable(id)`
+- [x] `deleteDish(id)` — existe, pero se usa en la 8.6 escondido tras
       confirmación
-- [ ] Un hook hermano `useCategories()` para el desplegable de categoría y para
+- [x] Un hook hermano `useCategories()` para el desplegable de categoría y para
       la 8.7
 
 ⚠️ La diferencia con `useMenu()` es que aquí `available` no filtra. Si el hook
@@ -316,13 +346,13 @@ paga la dependencia sin cobrar el beneficio.
 
 **~1 h · la pantalla que van a usar a diario**
 
-- [ ] Tabla de platos agrupados por categoría, con nombre, precio formateado
+- [x] Tabla de platos agrupados por categoría, con nombre, precio formateado
       con `formatPrice()` y enlace a editar
-- [ ] Interruptor **en carta / fuera de carta** por fila, que llama a
+- [x] Interruptor **en carta / fuera de carta** por fila, que llama a
       `toggleAvailable` — es lo que más van a tocar y tiene que estar a un clic,
       sin entrar a editar
-- [ ] Los platos fuera de carta se ven, atenuados, no se esconden
-- [ ] Estados de `loading`, `error` y lista vacía, como en `TeamPage`
+- [x] Los platos fuera de carta se ven, atenuados, no se esconden
+- [x] Estados de `loading`, `error` y lista vacía, como en `TeamPage`
 
 Sin florituras de diseño: **el panel puede ser feo, la carta no**
 (`docs/panel.md`, principio 2). Estilo el de `TeamPage`, que es Tailwind gris y
@@ -334,14 +364,14 @@ directo.
 
 **~1 h · dos páginas, un componente**
 
-- [ ] `DishForm` en `src/features/admin/components/`, con `input`, `textarea` y
+- [x] `DishForm` en `src/features/admin/components/`, con `input`, `textarea` y
       un `select` de categorías. Sin editor enriquecido (`docs/panel.md` §6)
-- [ ] `NewDishPage` lo monta con valores vacíos
-- [ ] `EditDishPage` carga el plato por el `id` de la ruta y se lo pasa como
+- [x] `NewDishPage` lo monta con valores vacíos
+- [x] `EditDishPage` carga el plato por el `id` de la ruta y se lo pasa como
       valores iniciales. Si el id no existe, **404, no un formulario vacío**
-- [ ] El precio se teclea en euros («12,50») y se guarda en céntimos. La
+- [x] El precio se teclea en euros («12,50») y se guarda en céntimos. La
       conversión, en un solo sitio junto a `formatPrice`
-- [ ] Borrar de verdad: escondido, con confirmación, en la página de edición y
+- [x] Borrar de verdad: escondido, con confirmación, en la página de edición y
       no en la lista
 
 Un solo `DishForm` para las dos páginas es lo que evita que los dos formularios
@@ -362,9 +392,9 @@ dar todos 1250. Coma decimal española, que `parseFloat` no entiende.
 
 **~45 min · lo último, y lo más fácil de recortar**
 
-- [ ] Lista editable de categorías: nombre y `sort_order` como campo numérico
-- [ ] Alta y borrado de categoría, con el error de `restrict` traducido
-- [ ] `sort_order` de los platos editable desde `DishForm`
+- [x] Lista editable de categorías: nombre y `sort_order` como campo numérico
+- [x] Alta y borrado de categoría, con el error de `restrict` traducido
+- [x] `sort_order` de los platos editable desde `DishForm`
 
 **Nada de arrastrar y soltar.** Un campo numérico editable resuelve el 90 % del
 problema; el drag and drop, solo si lo piden después de usarlo un mes.

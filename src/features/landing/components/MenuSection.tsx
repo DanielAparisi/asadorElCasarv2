@@ -10,7 +10,7 @@ import { Tag } from '../../../shared/components/ui/Tag'
  * which is what lets the page be reordered without touching the section.
  */
 function MenuSection() {
-  const { dishes } = useMenu()
+  const { dishes, loading, error } = useMenu()
 
   return (
     <div id="la-carta" className="scroll-mt-6">
@@ -19,22 +19,33 @@ function MenuSection() {
         Nuestros clásicos
       </Heading>
 
-      <ul className="m-0 p-0 list-none border-t-[3px] border-ink">
-        {dishes.map((dish) => (
-          <li
-            key={dish.id}
-            className="flex items-baseline justify-between gap-4.5 px-1 py-3.75
-              border-b-[1.5px] border-ink last:border-b-[3px]"
-          >
-            <span className="font-title text-[1.75rem] tracking-[0.02em] uppercase text-ink max-[560px]:text-[1.375rem]">
-              {dish.name}
-            </span>
-            <span className="font-title text-[1.75rem] tracking-[0.02em] uppercase text-red whitespace-nowrap max-[560px]:text-[1.375rem]">
-              {formatPrice(dish.price_cents)}
-            </span>
-          </li>
-        ))}
-      </ul>
+      {/* Since useMenu reads from Supabase, the wait and the failure are real:
+          without these two branches a network error leaves the menu blank for
+          ever and says nothing (docs/cleanCode.md §0.2). */}
+      {loading ? (
+        <p className="font-mono text-xs tracking-[0.04em] text-ink-mute">Cargando la carta…</p>
+      ) : error ? (
+        <p className="font-mono text-xs tracking-[0.04em] text-ink-mute">
+          No hemos podido cargar la carta ahora mismo. Llámanos y te la contamos.
+        </p>
+      ) : (
+        <ul className="m-0 p-0 list-none border-t-[3px] border-ink">
+          {dishes.map((dish) => (
+            <li
+              key={dish.id}
+              className="flex items-baseline justify-between gap-4.5 px-1 py-3.75
+                border-b-[1.5px] border-ink last:border-b-[3px]"
+            >
+              <span className="font-title text-[1.75rem] tracking-[0.02em] uppercase text-ink max-[560px]:text-[1.375rem]">
+                {dish.name}
+              </span>
+              <span className="font-title text-[1.75rem] tracking-[0.02em] uppercase text-red whitespace-nowrap max-[560px]:text-[1.375rem]">
+                {formatPrice(dish.price_cents)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {/* Placeholder notice: it comes out with the real prices, in phase 1. */}
       <p className="mt-4 font-mono text-xs tracking-[0.04em] text-ink-mute">

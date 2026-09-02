@@ -1,32 +1,73 @@
-import menu from '../data/menu.json'
+import { useEffect, useState } from 'react'
+import { supabase } from '../../../shared/lib/supabase'
 import type { Category, Dish } from '../types'
 
 /**
- * The restaurant menu.
+ * The restaurant menu, read from Supabase.
  *
- * Today it reads a JSON file from the repo; tomorrow it will read the
- * `dishes` and `categories` tables from Supabase (docs/panel.md, phase 1).
- * That change must stay inside this file, which is why:
+ * Two things this hook used to do by hand now happen in the database:
  *
- *  - The types are exactly the columns of the future tables (see ../types).
- *  - It returns `{ dishes, categories, loading, error }` even though today the
- *    read is synchronous and `loading` is always false. Components already
- *    account for the wait, so on the day of the swap they are not touched.
+ *  - Unavailable dishes are filtered by the RLS policy `carta publica`, so
+ *    they never even reach the client. There is no `.filter(available)` here
+ *    on purpose — the panel's useDishes is the one that sees them.
+ *  - The ordering is `.order()`, not `.sort()`. Only the grouping by category
+ *    is still done here: `category_id` was a usable sort key while the ids
+ *    came from a hand written JSON, but the database assigns them in whatever
+ *    order the rows were inserted, so "Para picar" ended up as id 1 and
+ *    "Brasa" as id 2. What orders the menu is `categories.sort_order`.
+ *
+ * The returned shape is the same as when this read a JSON file, which is why
+ * swapping it touched no component. What did change is that `loading` now
+ * really starts as true and `error` is no longer always null.
  */
-
-// Sorted here once, not on every render: the JSON never changes.
-// In Supabase this becomes an `.order('sort_order')` in the query.
-const categories: Category[] = [...menu.categories].sort((a, b) => a.sort_order - b.sort_order)
-
-// No `as Dish[]` cast: this is how TypeScript actually verifies that the JSON
-// has the shape of the table. A cast here used to hide a missing `sort_order`,
-// and the sort ended up comparing undefined.
-const dishes: Dish[] = menu.dishes
-  // Unavailable dishes stay out of the public menu. In Supabase the RLS policy
-  // will do this, and will not even let them be read.
-  .filter((dish) => dish.available)
-  .sort((a, b) => a.category_id - b.category_id || a.sort_order - b.sort_order)
-
 export function useMenu() {
-  return { dishes, categories, loading: false, error: null as string | null }
+  const [dishes, setDishes] = useState<Dish[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    async function fetchMenu() {
+      // Both queries at once: they do not depend on each other, and the menu
+      // is not painted until both have arrived anyway.
+      const [categoriesResult, dishesResult] = await Promise.all([
+        supabase
+          .from('categories')
+          .select('id, name, sort_order')
+          .order('sort_order')
+          .abortSignal(controller.signal),
+        supabase
+          .from('dishes')
+          .select('id, name, description, price_cents, category_id, sort_order, available')
+          .order('sort_order')
+          .abortSignal(controller.signal),
+      ])
+
+      if (controller.signal.aborted) return
+
+      const failed = categoriesResult.error ?? dishesResult.error
+      if (failed) {
+        setError(failed.message)
+      } else {
+        const orderedCategories = categoriesResult.data as Category[]
+        setCategories(orderedCategories)
+        // Each category's dishes, in the order the categories go out. Doing it
+        // here and not with a join keeps the row shape equal to the table.
+        setDishes(
+          orderedCategories.flatMap((category) =>
+            (dishesResult.data as Dish[]).filter((dish) => dish.category_id === category.id),
+          ),
+        )
+      }
+
+      setLoading(false)
+    }
+
+    fetchMenu()
+    return () => controller.abort()
+  }, [])
+
+  return { dishes, categories, loading, error }
 }

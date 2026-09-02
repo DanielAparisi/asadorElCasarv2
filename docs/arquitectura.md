@@ -125,28 +125,35 @@ sección.
 ### `src/features/menu/` — la carta
 
 ```
-data/menu.json     hoy la fuente de datos
-types.ts           Dish y Category = columnas de las tablas futuras
-formatPrice.ts     1250 → "12,50 €"
+types.ts           Dish y Category = columnas de las tablas de Supabase
+formatPrice.ts     1250 ↔ "12,50 €" / "12,50" (los dos sentidos)
 hooks/useMenu.ts   la única puerta a los datos de la carta
 ```
 
-Es la pieza mejor preparada del proyecto. Hoy lee un JSON del repo; mañana
-leerá las tablas `dishes` y `categories` de Supabase, **y ese cambio se queda
-dentro de `useMenu.ts`**. Por eso:
+> **Actualizado (02/09/2026, tarea 8.3).** El cambio anunciado aquí ya está
+> hecho: `useMenu()` lee las tablas `dishes` y `categories` de Supabase y
+> `data/menu.json` ya no existe. La apuesta salió bien —la firma de retorno era
+> la definitiva, así que no hubo que cambiar los tipos ni la forma del hook— con
+> una excepción anotada en `docs/nextTasks.md` §8: `MenuSection` sí hubo que
+> tocarlo, porque no miraba `loading` ni `error` pese a lo que promete el tercer
+> punto de abajo.
 
-- Los tipos son exactamente las columnas de las tablas futuras. Nada de
+Es la pieza mejor preparada del proyecto. Lee las tablas `dishes` y
+`categories` de Supabase, **y toda esa lectura vive dentro de `useMenu.ts`**.
+Por eso:
+
+- Los tipos son exactamente las columnas de las tablas. Nada de
   `price: "12,00 €"`: el precio va en céntimos (`price_cents: number`), como
   en la base de datos.
-- `useMenu()` devuelve `{ dishes, categories, loading, error }` aunque hoy la
-  lectura sea síncrona y `loading` valga siempre `false`. Los componentes ya
-  contemplan la espera, así que el día del cambio no se tocan.
-- El JSON se lee **sin cast** (`menu.dishes`, no `menu.dishes as Dish[]`). Es
-  lo que hace que TypeScript compruebe de verdad la forma del archivo: un cast
-  ahí llegó a tapar un `sort_order` que faltaba en los seis platos.
-- El filtrado y el orden se hacen **una vez a nivel de módulo**, no en cada
-  render. En Supabase serán un `.eq('available', true)` y un
-  `.order('sort_order')`.
+- `useMenu()` devuelve `{ dishes, categories, loading, error }`. Desde que lee
+  de la red, `loading` empieza siendo `true` de verdad y `error` puede traer el
+  mensaje de Supabase.
+- El filtro de `available` ya no está en el cliente: lo hace la política de RLS,
+  y los platos fuera de carta no llegan siquiera al navegador. El panel, que sí
+  los necesita, los ve por su propia política (`admin/hooks/useDishes.ts`).
+- El orden viene de `.order('sort_order')`, y la carta se agrupa por
+  `categories.sort_order` —no por `category_id`, que la base de datos asigna
+  según entran las filas.
 
 ### `src/features/auth/` — sesión y acceso
 
@@ -163,16 +170,24 @@ pages/LoginPage.tsx
 
 ```
 components/AdminLayout.tsx   navegación + correo + cerrar sesión
+components/AdminHeading.tsx  el título de página del panel
+components/AdminInput.tsx    el input, y ADMIN_FIELD_CLASS para textarea/select
+components/AdminButton.tsx   el botón: primary y quiet
+components/AdminField.tsx    etiqueta + campo debajo
+components/DishForm.tsx      el formulario, compartido por el alta y la edición
 hooks/useAdmins.ts           lista de admins y alta de nuevos
-pages/DishesPage.tsx         lista de platos          (stub, fase 3)
-pages/NewDishPage.tsx        alta de plato            (stub, fase 3)
-pages/EditDishPage.tsx       edición de plato         (stub, fase 3)
-pages/CategoriesPage.tsx     categorías y orden       (stub, fase 4)
-pages/TeamPage.tsx           alta de admins           ← el único funcional
+hooks/useDishes.ts           platos: la lista completa, con los no disponibles
+hooks/useCategories.ts       categorías: lista, alta, orden y borrado
+pages/DishesPage.tsx         lista de platos con el interruptor de la carta
+pages/NewDishPage.tsx        alta de plato
+pages/EditDishPage.tsx       edición de plato, y el borrado tras confirmación
+pages/CategoriesPage.tsx     categorías y orden
+pages/TeamPage.tsx           alta de admins
 ```
 
-Cuatro de las cinco páginas están a la espera de las tablas `dishes` y
-`categories` (tarea 8 de `docs/nextTasks.md`).
+Las cinco páginas funcionan desde el 02/09/2026 (tarea 8). Los cuatro
+componentes `Admin*` son la respuesta a `docs/cleanCode.md` §1: el panel puede
+ser feo, pero su estilo tiene que estar en un solo sitio.
 
 ### `src/shared/` — lo genuinamente compartido
 
@@ -258,12 +273,25 @@ importa con `lazy()`. Resultado:
 
 | chunk | tamaño | quién lo descarga |
 |---|---|---|
-| `index` | 254 kB / 80 kB gzip | todo el mundo |
-| `supabase` | 208 kB / 54 kB gzip | solo quien entra en `/login` o `/admins` |
-| `ProtectedRoutes` | 5 kB | ídem |
-| páginas del panel | 0,3–2 kB c/u | solo la página que se abre |
+| `index` | 247 kB / 78 kB gzip | todo el mundo |
+| `supabase` | 217 kB / 57 kB gzip | **todo el mundo, desde la tarea 8.3** |
+| `ProtectedRoutes` | 5 kB | solo quien entra en `/login` o `/admins` |
+| páginas del panel | 0,8–2,5 kB c/u | solo la página que se abre |
 
 La carta pública pasó de 135 kB a 80 kB gzip: **−41 %**.
+
+> **Actualizado (02/09/2026).** Media victoria se ha perdido y conviene decirlo
+> claro: desde que `useMenu()` lee de Supabase, `HomePage` importa
+> `shared/lib/supabase`, así que **`supabase-js` vuelve a bajar en la carta
+> pública** (+57 kB gzip). Lo que sigue siendo cierto es lo otro: `App` no sabe
+> nada de autenticación y las páginas del panel siguen fuera del chunk
+> principal.
+>
+> Si algún día molesta, la salida no es deshacer el guard: es que la carta
+> pública pida sus dos tablas con un `fetch` al endpoint REST de PostgREST —son
+> dos `select` anónimos sin sesión ni realtime— y dejar `supabase-js` para el
+> panel. No se ha hecho hoy porque cambiar `useMenu` es diez minutos y aún no
+> hay una medida de que esos 57 kB duelan.
 
 `LoginRoute` y `AdminRoute` comparten módulo, y por tanto chunk: entrar por
 `/login` y pasar a `/admins` no dispara una segunda descarga.
