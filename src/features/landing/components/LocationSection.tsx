@@ -1,4 +1,14 @@
-import { ADDRESS, MAPS_DIRECTIONS_URL, MAPS_EMBED_URL, PHONE_HREF, PHONE_NUMBER } from '../content'
+import {
+  ADDRESS,
+  ADDRESS_EXTRA,
+  LOCALITY,
+  MAPS_DIRECTIONS_URL,
+  MAPS_EMBED_URL,
+  PHONE_HREF,
+  PHONE_NUMBER,
+  POSTAL_CODE,
+  REGION,
+} from '../content'
 import { Button } from '../../../shared/components/ui/Button'
 import { SectionHeading } from '../../../shared/components/ui/Heading'
 import { POSTER_BORDER } from '../../../shared/components/ui/tokens'
@@ -33,8 +43,10 @@ function LocationSection() {
         <div className="flex flex-col gap-6.5">
           <Detail label="Dirección">
             <p className="m-0 leading-[1.6] text-ink-soft">{ADDRESS}</p>
-            <p className="m-0 leading-[1.6] text-ink-soft">1.º piso, local 10</p>
-            <p className="m-0 leading-[1.6] text-ink-soft">El Casar, 19170 · Guadalajara</p>
+            <p className="m-0 leading-[1.6] text-ink-soft">{ADDRESS_EXTRA}</p>
+            <p className="m-0 leading-[1.6] text-ink-soft">
+              {LOCALITY}, {POSTAL_CODE} · {REGION}
+            </p>
           </Detail>
 
           <Detail label="Teléfono">

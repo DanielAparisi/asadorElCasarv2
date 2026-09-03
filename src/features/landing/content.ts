@@ -17,6 +17,24 @@ export const PHONE_HREF = 'tel:+34650711395'
 export const WHATSAPP_URL = 'https://wa.me/34650711395'
 
 export const ADDRESS = 'Calle Alcaldes de la Villa, 23'
+export const ADDRESS_EXTRA = '1.º piso, local 10'
+export const LOCALITY = 'El Casar'
+export const POSTAL_CODE = '19170'
+export const REGION = 'Guadalajara'
+/** ISO 3166-2 code of the province, for the `geo.region` meta tag. */
+export const REGION_CODE = 'ES-GU'
+
+/**
+ * Coordinates of the door, for local search.
+ *
+ * Empty on purpose: they have to be the real ones. In Google Maps, right click
+ * on the spot → the first line of the menu is the pair, copy it here as
+ * `40.703123` / `-3.428456`. While they are empty the geo tags and the `geo`
+ * block of the business card are left out, which is the right thing — a
+ * restaurant pinned 400 m away is worse than one with no pin at all.
+ */
+export const LATITUDE = ''
+export const LONGITUDE = ''
 export const MAPS_DIRECTIONS_URL =
   'https://www.google.com/maps/dir/?api=1&destination=Calle+Alcaldes+de+la+Villa+23,+19170+El+Casar,+Guadalajara'
 export const MAPS_EMBED_URL =

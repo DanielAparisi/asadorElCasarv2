@@ -105,6 +105,9 @@ la app.
 
 - [ ] Añadir el rewrite SPA (todo a `/index.html`) del hosting elegido
 - [ ] Cabecera `X-Robots-Tag: noindex` para `/admins/*` y `/login`
+- [ ] Poner el dominio en `VITE_SITE_URL` (la variable del hosting, y el `.env`
+      local). Sin ella, la tarea 12 deja fuera `og:url`, el `canonical` y la
+      imagen absoluta de la vista previa
 
 El comentario de `index.html:9` da por hecho que el noindex "se controla por
 ruta desde el hosting", pero ese hosting todavía no está configurado.
@@ -477,3 +480,81 @@ también rompen el CI. El build corre **sin** las variables `VITE_SUPABASE_*`, a
 propósito: comprueba que la app compila sin ellas.
 
 Coste en el chunk público: +1,2 kB (+0,3 kB gzip), 255,2 kB / 80,8 kB gzip.
+
+---
+
+## 11. La tabla `plates` huérfana — ✅ ESCRITA, pendiente de aplicar (02/09/2026)
+
+**~10 min · seguridad**
+
+`public.plates` era el primer boceto de la carta (`title`, `price` en euros
+enteros) con una sola fila de prueba dentro, «pollo asado». No la leía nadie: la
+app nunca la ha mencionado.
+
+Se borra porque es **anterior** a
+`20260826100433_seguridad_permisos_por_defecto.sql` y conservaba los permisos de
+entonces: `insert`, `update` y `delete` para `anon`. El RLS la tapaba —sin
+políticas no devuelve nada—, pero una tabla que no usa nadie y que sobre el
+papel puede escribir un visitante anónimo es una tabla que se borra.
+
+- [x] `20260902212555_drop_plates.sql`
+- [ ] **PENDIENTE** — aplicarla: `npx supabase db push --linked`
+
+---
+
+## 12. SEO: descripción, vista previa del enlace y ficha de Google — ✅ HECHO (02/09/2026)
+
+**~45 min**
+
+Antes de esto, la portada no tenía `<meta name="description">` —así que Google
+se inventaba el resumen— y al pegar el enlace en WhatsApp salía un rectángulo
+gris sin foto ni texto.
+
+- [x] `src/features/landing/seo.ts`: descripción, Open Graph, Twitter Card y la
+      ficha JSON-LD de tipo `Restaurant`
+- [x] Un plugin en `vite.config.ts` que las escribe en `index.html`. **No puede
+      hacerlo React**: los rastreadores leen el HTML que descargan y no ejecutan
+      el JavaScript
+- [x] Los datos salen de `content.ts`. Para eso se movieron allí la localidad,
+      el código postal y la provincia, que estaban escritos a mano en
+      `LocationSection` y `SiteFooter`
+- [x] El horario de la ficha se genera desde `WEEKLY_SCHEDULE`, así que no puede
+      contradecir al que se ve en la web
+- [x] `public/og.jpg` (copia del logo) como imagen de la vista previa: en
+      `public/` porque `src/assets` añade un hash al nombre en cada build y las
+      cachés de los rastreadores se quedan con la URL vieja
+- [x] La CSP lleva ahora el hash `sha256` del bloque JSON-LD: para la CSP es un
+      `<script>` aunque no ejecute nada, y sin el hash el navegador lo bloquea
+
+Lo que queda fuera hasta que haya dominio (tarea 4): `og:url`, el `canonical` y
+la imagen de vista previa en absoluto. Se escriben solas en cuanto
+`VITE_SITE_URL` tenga valor. **Una URL equivocada rompe la vista previa para
+todo el mundo; una ausente, no.**
+
+### SEO local, y el resto del `head` (02/09/2026, misma tanda)
+
+Para un asador de pueblo esta es la mitad que de verdad trae clientes: la
+búsqueda que importa es «pollo asado El Casar» hecha desde un móvil a dos
+calles.
+
+- [x] `<title>` con el pueblo dentro: «Asador El Casar · Pollo a la brasa en El
+      Casar». Antes era solo el nombre
+- [x] Metas `geo.region` (`ES-GU`) y `geo.placename`. Las lee Bing y las copian
+      los directorios que raspan en vez de interpretar
+- [x] En la ficha JSON-LD: `areaServed`, `hasMap` (el enlace de «cómo llegar»),
+      `acceptsReservations` y, cuando haya dominio, `hasMenu` apuntando a
+      `/#la-carta`
+- [x] `robots` con `max-image-preview:large` y `max-snippet:-1`: que la foto del
+      plato sea la grande del resultado y que el resumen no se corte
+- [x] `public/robots.txt`, con `/admins` y `/login` fuera del rastreo
+- [x] `preconnect` a Supabase: la carta pide los platos en cuanto pinta, así que
+      la conexión se abre mientras baja el JavaScript
+- [ ] **PENDIENTE** — las coordenadas exactas de la puerta en `content.ts`
+      (`LATITUDE` / `LONGITUDE`). En Google Maps, clic derecho sobre el local →
+      la primera línea del menú es el par. Mientras estén vacías se omiten
+      `geo.position`, `ICBM` y el bloque `geo` de la ficha: **un pin a 400 m es
+      peor que ningún pin**
+
+Cómo comprobarlo cuando esté desplegado: pegar el enlace en un chat de WhatsApp
+(la vista previa) y pasar la URL por el *Rich Results Test* de Google (la
+ficha).

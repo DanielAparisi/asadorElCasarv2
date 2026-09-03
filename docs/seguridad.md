@@ -61,6 +61,12 @@ Ahora cada tabla nueva nace sin permisos y hay que concedérselos explícitament
 Un olvido produce un fallo evidente (nadie puede leer) en vez de uno silencioso
 (todo el mundo puede escribir).
 
+> **Nota (02/09/2026).** Quedaba una tabla anterior a ese cambio: `plates`, el
+> primer boceto de la carta, sin usar y con `insert`, `update` y `delete`
+> concedidos a `anon`. El RLS la tapaba —no tenía políticas, así que no devolvía
+> nada— pero era justo la capa única de defensa que esta sección existe para no
+> tener. Se borra en `20260902212555_drop_plates.sql`.
+
 ### Capa 3 — XSS
 
 Estado: **limpio hoy**, con CSP añadida como red de seguridad.
@@ -92,7 +98,12 @@ datos:
 en desarrollo rompería el HMR de Vite. Lo importante que dice:
 
 - `script-src 'self'` sin `unsafe-inline` ni `unsafe-eval`: aunque alguien
-  consiga inyectar un `<script>`, el navegador se niega a ejecutarlo.
+  consiga inyectar un `<script>`, el navegador se niega a ejecutarlo. Desde el
+  02/09/2026 lleva además **un hash `sha256`**: el de la ficha JSON-LD del
+  negocio, que es un `<script type="application/ld+json">` y por tanto un
+  `<script>` a ojos de la CSP aunque no ejecute nada. Se calcula en el build a
+  partir del mismo texto que se inyecta (`vite.config.ts`), así que no hay que
+  mantenerlo a mano. Un hash concreto, y `unsafe-inline` se queda fuera.
 - `connect-src` limitado a Supabase: un script robado no puede enviar el token a
   un servidor ajeno.
 - `form-action 'self'`: un formulario inyectado no puede mandar credenciales

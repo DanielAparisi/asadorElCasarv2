@@ -53,7 +53,7 @@ junto. Añadir un campo a un plato toca `features/menu/` y nada más.
 ```
 asadorElCasarv1/
 ├── index.html                  fuentes de Google, meta referrer, #root
-├── vite.config.ts              React + Tailwind + plugin de CSP
+├── vite.config.ts              React + Tailwind + plugins de SEO y CSP
 ├── eslint.config.js
 ├── tsconfig.{json,app,node}.json
 ├── .env                        no se sube (VITE_SUPABASE_URL, ..._PUBLISHABLE_KEY)
@@ -99,6 +99,7 @@ asadorElCasarv1/
 
 ```
 content.ts                  todos los textos y datos de contacto
+seo.ts                      título, descripción, vista previa, geo y JSON-LD
 pages/HomePage.tsx          solo compone secciones (47 líneas)
 components/
   SiteHeader.tsx            banda de tinta: marca, menú, teléfono
@@ -406,6 +407,28 @@ llama**.
 Registrarse **no** da acceso al panel. Hubo un trigger que creaba una fila en
 `Admins` por cada alta en `auth.users` — es decir, registro público = panel
 público. Se eliminó; ahora el alta la da un admin a mano.
+
+### El SEO vive en el HTML, no en React
+
+`landing/seo.ts` construye la descripción, las etiquetas Open Graph y la ficha
+JSON-LD del negocio, y un plugin de `vite.config.ts` las escribe en
+`index.html`. **Tiene que ser así**: Google, WhatsApp y Facebook leen el HTML
+que descargan, y esta app pinta todo desde JavaScript — unas etiquetas puestas
+por React llegan tarde para los únicos que las leen.
+
+Los datos salen de `content.ts`, no se reescriben: un restaurante cuyo horario
+real y cuyo horario en Google no coinciden está peor que uno que nunca lo
+publicó.
+
+El mismo plugin escribe el `<title>`, las metas `geo.*`, el `robots` y un
+`preconnect` a Supabase — la carta pide los platos nada más pintar, así que la
+conexión se abre mientras baja el JavaScript. `public/robots.txt` deja `/admins`
+y `/login` fuera del rastreo.
+
+Lo que necesita URL absoluta (`og:url`, `og:image`, el `canonical` y el `url`
+de la ficha) se escribe **solo si `VITE_SITE_URL` tiene valor**. Mientras no
+haya dominio se omite a propósito: una URL equivocada rompe la vista previa para
+todo el mundo, y una ausente no.
 
 ### La CSP
 

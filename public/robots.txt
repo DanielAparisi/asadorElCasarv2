@@ -1,0 +1,10 @@
+# El panel no tiene nada que buscar y no debe salir en Google. La cabecera
+# X-Robots-Tag del hosting es lo que de verdad lo impide (tarea 4); esto es la
+# capa barata que además evita que se rastree.
+User-agent: *
+Allow: /
+Disallow: /admins
+Disallow: /login
+
+# Sin línea `Sitemap:` a propósito: hace falta el dominio, y una sola página no
+# necesita sitemap. Cuando haya dominio y más rutas públicas, aquí va.

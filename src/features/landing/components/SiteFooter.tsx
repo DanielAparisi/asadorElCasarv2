@@ -1,4 +1,4 @@
-import { ADDRESS, NAV_LINKS, PHONE_NUMBER, WHATSAPP_URL } from '../content'
+import { ADDRESS, LOCALITY, NAV_LINKS, PHONE_NUMBER, POSTAL_CODE, WHATSAPP_URL } from '../content'
 import { SocialLinks } from './SocialLinks'
 import { BUTTON_ON_INK, Button } from '../../../shared/components/ui/Button'
 import { Brand } from '../../../shared/components/ui/Brand'
@@ -66,7 +66,7 @@ function SiteFooter() {
             © 2026 Asador El Casar · Comida para llevar
           </p>
           <p className="m-0 font-mono text-xs tracking-[0.05em] text-ink-mute">
-            {ADDRESS} · El Casar, 19170
+            {ADDRESS} · {LOCALITY}, {POSTAL_CODE}
           </p>
         </div>
 
