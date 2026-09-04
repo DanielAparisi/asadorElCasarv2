@@ -113,9 +113,17 @@ function cspPlugin(supabaseUrl: string, jsonLdHash: string): Plugin {
     // without its hash the browser blocks it — and Google reads a rendered
     // page. One hash, and 'unsafe-inline' stays out.
     `script-src 'self' ${jsonLdHash}`,
-    // Tailwind compiles to a file, but React injects inline styles in some
-    // cases. The risk of an inline style is far lower.
-    "style-src 'self' 'unsafe-inline'",
+    // No 'unsafe-inline' here either, which is not the usual state of a React
+    // app. It holds because nothing in this project passes a `style` prop:
+    // Tailwind compiles to a file, and the checked build has zero `style="`
+    // attributes and zero inline `<style>` blocks. Assigning `el.style.x` from
+    // JavaScript is not what this directive governs, so React setting a
+    // display on an element at runtime is unaffected.
+    //
+    // ⚠️ Adding a single `style={{ … }}` anywhere brings it back — and it
+    // fails silently: the element simply paints unstyled in production, never
+    // in `npm run dev`, because the CSP is build-only. Use a class.
+    "style-src 'self'",
     // blob: and data: to preview photos before uploading them to Storage.
     `img-src 'self' data: blob: ${supabaseUrl}`,
     // The fonts are served from this same origin since they stopped coming

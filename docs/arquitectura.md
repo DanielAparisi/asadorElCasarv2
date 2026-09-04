@@ -481,8 +481,9 @@ Es una segunda línea de defensa: la primera es que React escapa todo lo que
 interpola. Importa más de lo que parece porque **supabase-js guarda el token de
 sesión en localStorage**: un XSS aquí no es un `alert()`, es robar la sesión de
 un admin y con ella la capacidad de escribir en la base de datos. Por eso
-`script-src 'self'` sin `unsafe-inline` ni `unsafe-eval`, y `connect-src`
-limitado a Supabase.
+`script-src 'self'` sin `unsafe-inline` ni `unsafe-eval`, `style-src 'self'`
+—también sin `unsafe-inline`, ver docs/seguridad.md— y `connect-src` limitado a
+Supabase.
 
 ### Dos trampas del proyecto
 

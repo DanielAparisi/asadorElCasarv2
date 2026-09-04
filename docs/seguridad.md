@@ -110,6 +110,34 @@ en desarrollo rompería el HMR de Vite. Lo importante que dice:
 - `form-action 'self'`: un formulario inyectado no puede mandar credenciales
   fuera.
 - `object-src 'none'`, `base-uri 'self'`: cierran dos vías clásicas de evasión.
+- `style-src 'self'` **sin `unsafe-inline`** desde el 04/09/2026, que no es lo
+  normal en una app React. Se sostiene porque el proyecto no pasa `style` a
+  ningún componente: Tailwind compila a archivo, y el build comprobado tiene
+  cero atributos `style="` y cero bloques `<style>`. Asignar `el.style.x` desde
+  JavaScript no lo gobierna esta directiva, así que React sigue pudiendo tocar
+  el `display` de un elemento en tiempo de ejecución.
+
+  > La trampa: un solo `style={{ … }}` en cualquier componente lo rompe, y lo
+  > rompe **en silencio** —el elemento se pinta sin estilo en producción y
+  > nunca en `npm run dev`, porque la CSP es solo de build—. Se usa una clase.
+
+Lo que la CSP **no** puede arreglar, y por qué sigue siendo aceptable:
+
+- **Va en `<meta>`, no en cabecera.** Es lo único que un sitio estático sin
+  hosting decidido puede hacer, y cubre todas las directivas salvo tres:
+  `frame-ancestors`, `report-uri` y `sandbox`, que el navegador ignora en un
+  `<meta>`. Ver capa 4.
+- **`script-src 'self'` es una lista de permitidos por origen**, y las
+  auditorías recomiendan nonces en su lugar. Un nonce hay que generarlo por
+  petición, y aquí no hay servidor que lo genere: el HTML es un archivo. Con
+  todos los scripts servidos desde el propio origen, con nombre con hash de
+  contenido y sin contenido subido por usuarios en ese origen, `'self'` no tiene
+  por dónde eludirse.
+- **Sin Trusted Types.** `require-trusted-types-for 'script'` sería la siguiente
+  vuelta de tuerca. No está puesto porque el bundle de React contiene sumideros
+  `innerHTML` y activarlo sin poder probar el panel entero en un navegador
+  arriesga una pantalla en blanco. Es una mejora real y pendiente, no un
+  descarte.
 
 ### Capa 4 — Cabeceras del hosting
 
@@ -117,7 +145,9 @@ Estado: **pendiente**, depende de dónde se despliegue.
 
 La CSP en `<meta>` cubre casi todo, pero **`frame-ancestors` solo funciona como
 cabecera HTTP real**. Sin ella, la app se puede meter en un `<iframe>` en otra
-web y hacer clickjacking sobre el panel.
+web y hacer clickjacking sobre el panel. `X-Frame-Options: DENY` es el sustituto
+antiguo y hace el mismo trabajo para este caso, así que la lista de abajo ya
+tapa el agujero aunque la CSP siga en `<meta>`.
 
 En Netlify o Cloudflare Pages, un archivo `public/_headers`:
 
@@ -129,6 +159,12 @@ En Netlify o Cloudflare Pages, un archivo `public/_headers`:
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains
 ```
+
+El día que haya hosting, lo que de verdad conviene es **mover la CSP entera de
+`<meta>` a cabecera** y añadirle `frame-ancestors 'none'`. Es la misma cadena de
+directivas que ya construye `cspPlugin`, así que el cambio es exportarla en vez
+de inyectarla, y de paso desaparece la advertencia recurrente de Lighthouse
+sobre la CSP en `<meta>`.
 
 En Vercel, lo mismo dentro de `vercel.json`. Cuando esté decidido el hosting, se
 añade el archivo que corresponda.
