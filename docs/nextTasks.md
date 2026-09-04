@@ -198,7 +198,8 @@ con los precios del asador.
 >    `docs/cleanCode.md` §0.2 ya tenía anotado. Después se reescribió entero:
 >    la carta de la portada es ahora una cuadrícula a ancho completo, agrupada
 >    por categorías, con una foto por plato (`DishCard`). Mientras no haya
->    fotos se pinta un marco de trama diagonal que mide lo mismo. La subida de fotos sigue siendo la fase 5 de `docs/panel.md`.
+>    fotos se pinta un marco de trama diagonal que mide lo mismo. La subida de
+>    fotos se hizo el 04/09/2026 (fase 5 de `docs/panel.md`).
 > 4. **El `db push` arrastró tres migraciones anteriores** que estaban sin
 >    registrar. Dos ya estaban aplicadas a mano y volver a aplicarlas no cambió
 >    nada, pero la del renombrado (`20260831093559`) **no lo estaba**: en
@@ -410,7 +411,8 @@ problema; el drag and drop, solo si lo piden después de usarlo un mes.
 
 **Fuera de esta tarea, a propósito:** las fotos de los platos (`photo_path` se
 crea en la 8.1 pero se queda vacío). Storage, subida, redimensionado en cliente
-y reemplazo son la fase 5 de `docs/panel.md` §5, la parte más fiddly, y no
+y reemplazo son la fase 5 de `docs/panel.md` §5 —hecha el 04/09/2026, después de
+esta tarea—, la parte más fiddly, y no
 bloquean nada de lo de arriba.
 
 ---

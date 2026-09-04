@@ -232,16 +232,17 @@ de verdad, y deja de hacer falta pasar `userId` a mano a `useEsAdmin`.
 
 ## 5. Fotos de los platos
 
-> **Estado (02/09/2026).** El lado de la carta pública ya está hecho: la carta
-> es una cuadrícula con una foto por plato, `photo_path` viaja en la consulta y
-> `menu/dishPhoto.ts` sabe construir la URL pública. Mientras no haya foto se
-> pinta el marco de trama diagonal, que ocupa exactamente lo mismo, así que
-> subir la primera foto no mueve la maquetación. **Falta todo lo demás de esta
-> sección**: el bucket, sus políticas y la subida desde el panel.
+> **Estado (04/09/2026).** Hecho, salvo aplicar la migración. Falta ejecutar
+> `20260904120000_dish_photos_storage.sql` en el SQL Editor: hasta entonces el
+> bucket no existe y la subida falla.
+>
+> El bucket se llama `dishes`, no `platos`. Esta sección lo llamó `platos/`
+> desde antes del renombrado del 31/08/2026, pero `menu/dishPhoto.ts` construye
+> URLs de `/dishes/` desde que se escribió. Lo manda el código.
 
-Van a **Supabase Storage**, bucket público `platos/`. En la tabla se guarda solo
-la ruta (`foto_path`), no la URL completa: si cambia el dominio del proyecto, las
-URLs guardadas se rompen y las rutas no.
+Van a **Supabase Storage**, bucket público `dishes`. En la tabla se guarda solo
+la ruta (`photo_path`), no la URL completa: si cambia el dominio del proyecto,
+las URLs guardadas se rompen y las rutas no.
 
 Nunca en la base de datos como bytes, y nunca en `src/assets/` — eso obliga a un
 despliegue para cambiar una foto, justo lo que el panel viene a evitar.
@@ -249,9 +250,36 @@ despliegue para cambiar una foto, justo lo que el panel viene a evitar.
 Storage tiene políticas propias, con la misma lógica de siempre: lectura pública,
 escritura apoyada en `is_admin()`.
 
-Detalles que muerden al construirlo: redimensionar en el cliente antes de subir
-(las fotos de móvil pesan 5 MB), borrar el archivo viejo al reemplazarlo, y
-decidir qué pasa con la foto cuando se borra el plato.
+Los tres detalles que mordían, y cómo quedaron:
+
+**Redimensionar antes de subir.** `admin/lib/shrinkImage.ts`: 800 px de lado
+largo y WebP al 0.8, en un `canvas`, antes de que el archivo salga del
+navegador. Una foto de móvil de 5 MB acaba en ~60 kB. No hay ningún CDN
+transformando nada por el camino —se evaluó, y las transformaciones de Supabase
+son de plan Pro— así que este es el único sitio donde la foto adelgaza. Un solo
+tamaño y sin `srcset` porque `DishCard` las pinta en un `aspect-square` de
+tamaño fijo: 800 px cubre la mayor a 2x.
+
+> La trampa que se llevó la tarde: `createImageBitmap(file, { imageOrientation:
+> 'from-image' })`. Los móviles no rotan los píxeles, escriben la orientación en
+> el EXIF; un `canvas` la ignora, y sin esa opción toda foto hecha en vertical
+> se sube tumbada. No se ve al probar arrastrando imágenes desde el portátil,
+> porque esas no traen EXIF.
+
+**Borrar la vieja al reemplazar.** En `useDishes.updateDish`, y **después** de
+que la fila se haya guardado. El orden contrario pierde la foto cada vez que
+falla el guardado. El nombre del archivo es un UUID y no el nombre del plato:
+dos "Pollo entero" chocarían, un acento daría una ruta que Storage rechaza, y
+reutilizar el nombre deja al CDN sirviendo la foto vieja desde su caché.
+
+**Qué pasa al borrar el plato.** Se borra también la foto, en `deleteDish`.
+Storage no tiene `on delete cascade`: sin eso el bucket acumula la foto de cada
+plato que ha existido.
+
+Borrar un archivo nunca muestra error. Siempre ocurre después de que la fila ya
+esté guardada o borrada, así que la foto ya es inalcanzable desde la carta pase
+lo que pase; un archivo huérfano cuesta unos kB, y un error tras un guardado
+correcto le diría al admin que su cambio no se aplicó, cuando sí se aplicó.
 
 ---
 
@@ -300,6 +328,6 @@ solo hay un botón, escondido en la edición y con confirmación.
 `sort_order` editable como número, en `CategoriesPage` y en `DishForm`. Sin
 arrastrar y soltar, como estaba decidido.
 
-**Fase 5 — las fotos** *(pendiente, lo único que queda)*
+**Fase 5 — las fotos** *(hecha el 04/09/2026, falta aplicar la migración)*
 Storage, subida, redimensionado, reemplazo. Es la parte más fiddly: va al final
 a propósito.

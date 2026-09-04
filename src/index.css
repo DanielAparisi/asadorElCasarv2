@@ -192,6 +192,31 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* How the browser is allowed to break a line.
+ *
+ * `balance` on the headings: they are display sizes —the section titles run at
+ * 5.5rem— and they wrap two or three times, so the default leaves a last line
+ * with one word hanging under a full one. `balance` evens the lines out. It is
+ * only worth asking for on short blocks, which is why it stops at the
+ * headings: browsers cap it at a handful of lines and ignore it past that.
+ *
+ * `pretty` on the prose: it does not even the whole block, only refuses to
+ * leave the last line orphaned, which is the visible defect in a paragraph.
+ *
+ * `pretty` is not Baseline yet —Chrome has it, the rest are arriving— and that
+ * is fine here: a browser that does not know the value drops the declaration
+ * and wraps the way it always did. Nothing to guard, nothing to polyfill.
+ */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
 /* Text selection in the house colours instead of the system blue. */
 ::selection {
   background-color: var(--color-amber);

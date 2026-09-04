@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../../shared/lib/supabase'
 import type { Dish } from '../../menu/types'
+import { useDishPhoto } from './useDishPhoto'
 
 /** The columns the panel writes. The database fills in the rest. */
 export type DishInput = {
@@ -10,6 +11,8 @@ export type DishInput = {
   category_id: number
   sort_order: number
   available: boolean
+  /** Path inside the Storage bucket, never a full URL (menu/dishPhoto.ts). */
+  photo_path: string | null
 }
 
 const COLUMNS =
@@ -33,6 +36,10 @@ const COLUMNS =
  * refetching the list — the same thing useAdmins.addAdmin does.
  */
 export function useDishes() {
+  // Only `removePhoto` is used here. Uploading belongs to the form, which is
+  // where the file is chosen; what this hook owns is the file that stops being
+  // reachable when a row changes or goes away.
+  const { removePhoto } = useDishPhoto()
   const [dishes, setDishes] = useState<Dish[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -83,6 +90,10 @@ export function useDishes() {
     setSaving(true)
     setSaveError(null)
 
+    // Read before writing: after the update the old path is gone from the row
+    // and there is no way left to find the file it pointed at.
+    const previousPhoto = dishes.find((dish) => dish.id === id)?.photo_path ?? null
+
     const { data, error } = await supabase
       .from('dishes')
       .update(changes)
@@ -98,6 +109,14 @@ export function useDishes() {
 
     const updated = data as Dish
     setDishes((previous) => previous.map((dish) => (dish.id === id ? updated : dish)))
+
+    // The replaced photo, deleted only once the row no longer points at it.
+    // The other order —delete first, save second— loses the photo whenever the
+    // save fails.
+    if (previousPhoto && previousPhoto !== updated.photo_path) {
+      void removePhoto(previousPhoto)
+    }
+
     return updated
   }
 
@@ -120,6 +139,8 @@ export function useDishes() {
     setSaving(true)
     setSaveError(null)
 
+    const photo = dishes.find((dish) => dish.id === id)?.photo_path ?? null
+
     const { error } = await supabase.from('dishes').delete().eq('id', id)
     setSaving(false)
 
@@ -129,6 +150,9 @@ export function useDishes() {
     }
 
     setDishes((previous) => previous.filter((dish) => dish.id !== id))
+    // Nothing points at the file any more. Storage does not cascade: without
+    // this the bucket keeps every photo of every dish ever deleted.
+    if (photo) void removePhoto(photo)
     return true
   }
 

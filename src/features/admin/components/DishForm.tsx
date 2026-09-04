@@ -6,6 +6,7 @@ import type { DishInput } from '../hooks/useDishes'
 import AdminButton from './AdminButton'
 import AdminField from './AdminField'
 import AdminInput, { ADMIN_FIELD_CLASS } from './AdminInput'
+import DishPhotoField from './DishPhotoField'
 
 /**
  * The one dish form, used by both the new and the edit screen. Two forms would
@@ -38,6 +39,7 @@ function DishForm({
   const [categoryId, setCategoryId] = useState(dish?.category_id ?? categories[0]?.id)
   const [sortOrder, setSortOrder] = useState(String(dish?.sort_order ?? 0))
   const [available, setAvailable] = useState(dish?.available ?? true)
+  const [photoPath, setPhotoPath] = useState<string | null>(dish?.photo_path ?? null)
   const [priceError, setPriceError] = useState<string | null>(null)
 
   if (categories.length === 0) {
@@ -69,6 +71,7 @@ function DishForm({
       category_id: categoryId,
       sort_order: Number(sortOrder) || 0,
       available,
+      photo_path: photoPath,
     })
   }
 
@@ -118,6 +121,8 @@ function DishForm({
           onChange={(event) => setSortOrder(event.target.value)}
         />
       </AdminField>
+
+      <DishPhotoField photoPath={photoPath} onChange={setPhotoPath} />
 
       <label className="flex items-center gap-2 mb-6 text-sm">
         <input
