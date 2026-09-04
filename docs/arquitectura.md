@@ -52,14 +52,17 @@ junto. Añadir un campo a un plato toca `features/menu/` y nada más.
 
 ```
 asadorElCasarv1/
-├── index.html                  fuentes de Google, meta referrer, #root
-├── vite.config.ts              React + Tailwind + plugins de SEO y CSP
+├── index.html                  preload de fuentes locales, meta referrer, #root
+├── vite.config.ts              React + Tailwind + plugins de head, CSP y llms.txt
 ├── eslint.config.js
 ├── tsconfig.{json,app,node}.json
 ├── .env                        no se sube (VITE_SUPABASE_URL, ..._PUBLISHABLE_KEY,
 │                               VITE_SITE_URL). Las documenta el README
 │
-├── public/                     favicon.svg, icons.svg
+├── public/                     favicon.svg, icons.svg, og.jpg, robots.txt
+│   └── fonts/                  las cuatro familias en .woff2, servidas por
+│                               nosotros y no por Google (§7). `llms.txt`
+│                               no está aquí: lo genera vite.config.ts
 │
 ├── docs/
 │   ├── arquitectura.md         este archivo
@@ -79,7 +82,8 @@ asadorElCasarv1/
     ├── assets/                 logo.jpg, hero.png
     │
     ├── app/
-    │   └── App.tsx             router, guards y code splitting. Nada más.
+    │   ├── App.tsx             decide, por la ruta, si hace falta el router
+    │   └── Router.tsx          rutas, guards y code splitting. No se descarga en `/`
     │
     ├── features/               ← un directorio por dominio
     │   ├── landing/            la web pública
@@ -244,11 +248,14 @@ no añadir la excepción.
 
 ## 5. Routing y code splitting
 
-`app/App.tsx`, 59 líneas, hace tres cosas: montar el router, declarar las rutas
-y decidir qué se carga aparte.
+Son dos archivos. `app/App.tsx` no monta ningún router: mira la ruta y decide
+si hace falta uno. `app/Router.tsx` es el que declara las rutas y decide qué se
+carga aparte, y **solo se descarga cuando la ruta no es `/`**.
 
 ```
-/                       HomePage                    ← en el bundle principal
+/                       HomePage                    ← sin router, bundle principal
+   ↓ cualquier otra ruta
+Router.tsx (lazy)  ─── react-router-dom (13 kB gzip)
 /login                  LoginRoute   ─┐
 /admins                 AdminRoute   ─┴─ ProtectedRoutes (lazy, mismo chunk)
   /admins               DishesPage      (lazy)
@@ -270,18 +277,31 @@ usarlos nunca. Poner las páginas del panel en `lazy()` no arreglaba nada,
 porque el import seguía estando en `App`.
 
 La solución es que **`App` no sepa nada de autenticación**. El control de
-acceso vive en `features/auth/components/ProtectedRoutes.tsx`, que `App`
+acceso vive en `features/auth/components/ProtectedRoutes.tsx`, que `Router`
 importa con `lazy()`. Resultado:
 
 | chunk | tamaño | quién lo descarga |
 |---|---|---|
-| `index` | 248 kB / 79 kB gzip | todo el mundo |
-| `jsx-runtime` | 8 kB / 3 kB gzip | todo el mundo |
+| `index` | 218 kB / 68 kB gzip | todo el mundo |
+| `Router` + `react-router-dom` | 40 kB / 14 kB gzip | todo el que no entra por `/` |
 | `supabase` | 208 kB / 54 kB gzip | solo quien entra en `/login` o `/admins` |
 | `ProtectedRoutes` | 5 kB | ídem |
 | páginas del panel | 0,8–2,5 kB c/u | solo la página que se abre |
 
-La carta pública pasó de 135 kB a 82 kB gzip: **−39 %**.
+La carta pública pasó de 135 kB a 68 kB gzip: **−50 %**.
+
+> **Actualizado (04/09/2026).** El segundo recorte, y el mismo razonamiento un
+> piso más arriba. `react-router-dom` estaba en el chunk principal porque `App`
+> lo importaba, y la carta no lo usa para nada: es una sola página con anclas, y
+> el router solo existe para llegar a `/login` y `/admins`. Ahora `App` mira
+> `window.location.pathname` **antes** de importar nada con forma de router, y
+> `/` se sirve sin él. Son 14 kB gzip que dejan de descargar todos los que
+> vienen a mirar los precios.
+>
+> El precio es una regla nueva y fácil de romper: **ningún componente que pinte
+> la carta puede usar `Link`, `useNavigate` ni ningún hook del router**, porque
+> en `/` no hay `BrowserRouter` por encima y revientan. Por eso `shared/ui/Brand`
+> enlaza a la home con un `<a href="/">` y no con un `Link`.
 
 > **Actualizado (03/09/2026).** Esto estuvo roto un día: al pasar `useMenu()` a
 > Supabase (tarea 8.3), `HomePage` volvió a importar el cliente y `supabase-js`
@@ -432,6 +452,14 @@ de la ficha) se escribe **solo si `VITE_SITE_URL` tiene valor**. Mientras no
 haya dominio se omite a propósito: una URL equivocada rompe la vista previa para
 todo el mundo, y una ausente no.
 
+Un tercer plugin emite `llms.txt` en la raíz del sitio: el mismo problema y un
+lector distinto. Es Markdown, y le da a un modelo el horario, la dirección, el
+teléfono y cómo se encarga, en texto plano. También se genera desde
+`content.ts` y por el mismo motivo — una tercera copia del horario es la que se
+queda vieja. Los platos no están: viven en Supabase y cambian, así que el
+archivo remite a la página. Se sirve igual en `npm run dev` que en el build,
+para poder mirarlo sin compilar.
+
 ### Las fuentes son del propio dominio
 
 Anton, Space Grotesk y Space Mono se sirven desde `public/fonts` con sus
@@ -519,7 +547,7 @@ oculta a lectores de pantalla.
 
 Las rutas y las anclas se quedan en español a propósito: son direcciones que el
 usuario ve en la barra y que romperían enlaces guardados. Están centralizadas
-en `app/App.tsx` y `landing/content.ts` por si algún día se cambia de idea.
+en `app/Router.tsx` y `landing/content.ts` por si algún día se cambia de idea.
 
 Las cuatro migraciones SQL anteriores a `20260831093559_admins_rename_add_admin.sql`
 conservan sus nombres y comentarios en español: son el registro de lo que ya

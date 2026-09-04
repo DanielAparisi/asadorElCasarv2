@@ -4,10 +4,11 @@
 
 **El guard de `/admins` en React no es seguridad.** Es comodidad.
 
-El código de `App.tsx` que redirige a quien no es admin se ejecuta **en el
-navegador del atacante**, que controla ese navegador por completo. Se salta con
-las DevTools en treinta segundos, y ni siquiera hace falta: basta con ignorar la
-interfaz y llamar directamente a la API de Supabase con `fetch`.
+El código de `auth/ProtectedRoutes.tsx` que redirige a quien no es admin se
+ejecuta **en el navegador del atacante**, que controla ese navegador por
+completo. Se salta con las DevTools en treinta segundos, y ni siquiera hace
+falta: basta con ignorar la interfaz y llamar directamente a la API de Supabase
+con `fetch`.
 
 Por eso la pregunta correcta no es *"¿puede alguien entrar en la ruta
 /admins?"* — sí puede, y no importa. La pregunta es **"¿puede alguien leer o
