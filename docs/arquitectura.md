@@ -275,25 +275,27 @@ importa con `lazy()`. Resultado:
 
 | chunk | tamaño | quién lo descarga |
 |---|---|---|
-| `index` | 247 kB / 78 kB gzip | todo el mundo |
-| `supabase` | 217 kB / 57 kB gzip | **todo el mundo, desde la tarea 8.3** |
-| `ProtectedRoutes` | 5 kB | solo quien entra en `/login` o `/admins` |
+| `index` | 248 kB / 79 kB gzip | todo el mundo |
+| `jsx-runtime` | 8 kB / 3 kB gzip | todo el mundo |
+| `supabase` | 208 kB / 54 kB gzip | solo quien entra en `/login` o `/admins` |
+| `ProtectedRoutes` | 5 kB | ídem |
 | páginas del panel | 0,8–2,5 kB c/u | solo la página que se abre |
 
-La carta pública pasó de 135 kB a 80 kB gzip: **−41 %**.
+La carta pública pasó de 135 kB a 82 kB gzip: **−39 %**.
 
-> **Actualizado (02/09/2026).** Media victoria se ha perdido y conviene decirlo
-> claro: desde que `useMenu()` lee de Supabase, `HomePage` importa
-> `shared/lib/supabase`, así que **`supabase-js` vuelve a bajar en la carta
-> pública** (+57 kB gzip). Lo que sigue siendo cierto es lo otro: `App` no sabe
-> nada de autenticación y las páginas del panel siguen fuera del chunk
-> principal.
+> **Actualizado (03/09/2026).** Esto estuvo roto un día: al pasar `useMenu()` a
+> Supabase (tarea 8.3), `HomePage` volvió a importar el cliente y `supabase-js`
+> regresó al primer pintado de la carta. La salida ya estaba escrita aquí y es
+> la que se tomó: **la carta pública pide sus dos tablas con `fetch` al endpoint
+> REST**, que es exactamente lo que la librería habría enviado —dos `select`
+> anónimos, sin sesión ni realtime—, y el cliente se queda para el panel.
 >
-> Si algún día molesta, la salida no es deshacer el guard: es que la carta
-> pública pida sus dos tablas con un `fetch` al endpoint REST de PostgREST —son
-> dos `select` anónimos sin sesión ni realtime— y dejar `supabase-js` para el
-> panel. No se ha hecho hoy porque cambiar `useMenu` es diez minutos y aún no
-> hay una medida de que esos 57 kB duelan.
+> Con ello se fue también un import escondido: `menu/dishPhoto.ts` importaba el
+> cliente solo para componer una URL de Storage con `getPublicUrl`, que no hace
+> ninguna petición. Ahora la compone a mano. **Un solo import mal puesto
+> devuelve los 54 kB**, así que la comprobación es mirar si `dist/index.html`
+> lleva un `modulepreload` del chunk de supabase: si aparece, alguien lo ha
+> vuelto a importar desde la landing.
 
 `LoginRoute` y `AdminRoute` comparten módulo, y por tanto chunk: entrar por
 `/login` y pasar a `/admins` no dispara una segunda descarga.
@@ -429,6 +431,18 @@ Lo que necesita URL absoluta (`og:url`, `og:image`, el `canonical` y el `url`
 de la ficha) se escribe **solo si `VITE_SITE_URL` tiene valor**. Mientras no
 haya dominio se omite a propósito: una URL equivocada rompe la vista previa para
 todo el mundo, y una ausente no.
+
+### Las fuentes son del propio dominio
+
+Anton, Space Grotesk y Space Mono se sirven desde `public/fonts` con sus
+`@font-face` al principio de `src/index.css`, y las dos que hacen falta para el
+primer pintado se precargan desde `index.html`.
+
+Antes venían de Google Fonts con un `<link rel="stylesheet">`, que cuesta tres
+cosas: la hoja bloquea el pintado, hay que abrir conexión con dos dominios más
+antes de saber siquiera qué archivos pedir, y el titular saltaba al llegar Anton
+—el grueso del CLS—. De propina, la CSP ya no necesita permitir ningún dominio
+de Google ni en `style-src` ni en `font-src`.
 
 ### La CSP
 

@@ -225,7 +225,11 @@ justifique por qué es seguro.** Hoy hay uno; que no lleguen a diez.
 
 ---
 
-## 6. Las variables de entorno no se comprueban
+## 6. Las variables de entorno no se comprueban — ✅ HECHO (03/09/2026)
+
+> La comprobación está en `src/shared/lib/supabaseEnv.ts`, que es donde ahora
+> viven las dos variables. Se separaron de `supabase.ts` para que leerlas no
+> arrastre la librería.
 
 ```ts
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
@@ -325,7 +329,7 @@ Nada de esto es urgente salvo lo primero. Lo que no cabe en un rato, no se hace.
 |---|---|---|---|
 | 0.1 | `frame-src` de la CSP | **ya** — el mapa está roto en producción | 2 min |
 | 5 | `"strict": true` explícito | ya, es una línea | 1 min |
-| 6 | Comprobar las variables de entorno | ya | 5 min |
+| 6 | ✅ Comprobar las variables de entorno | hecho el 03/09/2026 | |
 | 2 | Alias `@/` | antes de la tarea 8 | 10 min |
 | 0.2 | ✅ `MenuSection`: categorías, `loading` y `error` | hecho el 02/09/2026 | |
 | 1 | ✅ `AdminInput` / `AdminButton` / `AdminHeading` | hecho el 02/09/2026 | |

@@ -45,4 +45,22 @@ function DishCard({ dish }: { dish: Dish }) {
   )
 }
 
+/**
+ * The same card while the dishes are on the wire.
+ *
+ * It exists for one reason: the menu arrives over the network, and painting a
+ * one line "Cargando…" first and then the real grid moves the whole page down
+ * — that is a layout shift, and it is what Lighthouse charges for in the CLS.
+ * Occupying the final space from the first frame costs nothing and the page
+ * stops jumping.
+ */
+export function DishCardSkeleton() {
+  return (
+    <li className="flex flex-col" aria-hidden>
+      <div className={`${FRAME} bg-cream`} />
+      <div className="mt-5.5 h-6 bg-line" />
+    </li>
+  )
+}
+
 export default DishCard

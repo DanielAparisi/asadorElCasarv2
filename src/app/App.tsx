@@ -1,70 +1,47 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "../features/landing/pages/HomePage";
-import NotFoundPage from "../shared/pages/NotFoundPage";
 import ErrorBoundary from "../shared/components/ErrorBoundary";
 import Spinner from "../shared/components/Spinner";
 
-// The public landing page ships in the main chunk: it is what most people come
-// for and it must not wait on an extra download.
-//
-// Everything private is loaded separately. Three or four people use it; there
-// is no reason for every visitor of the restaurant to download the admin panel
-// and the whole of supabase-js with it. That is why access control lives in
-// auth/ProtectedRoutes and not here: if App imported the session hooks,
-// Supabase would go straight back into the main chunk.
-const LoginRoute = lazy(() =>
-  import("../features/auth/components/ProtectedRoutes").then((m) => ({
-    default: m.LoginRoute,
-  })),
-);
-const AdminRoute = lazy(() =>
-  import("../features/auth/components/ProtectedRoutes").then((m) => ({
-    default: m.AdminRoute,
-  })),
-);
-const DishesPage = lazy(() => import("../features/admin/pages/DishesPage"));
-const NewDishPage = lazy(() => import("../features/admin/pages/NewDishPage"));
-const EditDishPage = lazy(() => import("../features/admin/pages/EditDishPage"));
-const CategoriesPage = lazy(
-  () => import("../features/admin/pages/CategoriesPage"),
-);
-const TeamPage = lazy(() => import("../features/admin/pages/TeamPage"));
+const Router = lazy(() => import("./Router"));
+
+/**
+ * `/` is served without a router at all.
+ *
+ * react-router-dom is 38 kB —14 kB gzipped— and the landing page has no use
+ * for it: it is a single page with anchors, and the only thing the router adds
+ * is the ability to reach `/login` and `/admins`. Those are three or four
+ * people. Everyone else was downloading a routing library to read the prices.
+ *
+ * This is the same reasoning that keeps supabase-js out of the landing (see
+ * features/menu/hooks/useMenu.ts), applied one level up.
+ *
+ * `window.location.pathname` and not a hook: the whole point is to decide
+ * before anything router-shaped is imported, and this runs once at module
+ * load. Nothing on `/` navigates client side, so it never goes stale — the
+ * router's own routes take over for every other URL.
+ *
+ * ⚠️ The consequence is that no component rendered by the landing may use
+ * `Link`, `useNavigate` or any other router hook: on `/` there is no
+ * `BrowserRouter` above them and they throw. That is why shared/ui/Brand links
+ * home with a plain anchor.
+ */
+const isLanding = window.location.pathname === "/";
 
 function App() {
   return (
-    <BrowserRouter>
-      {/* Inside the router so the boundary can still be rendered with routing
-          context available, and outside <Routes> so it covers every page,
-          including the lazy ones and their loading failures. */}
-      <ErrorBoundary>
-        {/* HomePage and NotFoundPage are not lazy, so `/` never suspends and this
-          fallback is never painted there. */}
+    // Outside the router, unlike before: the boundary now also has to cover
+    // the router chunk itself failing to download. Its fallback never needed
+    // routing context anyway — it reloads the page rather than navigating.
+    <ErrorBoundary>
+      {isLanding ? (
+        <HomePage />
+      ) : (
         <Suspense fallback={<Spinner />}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-
-            <Route path="/login" element={<LoginRoute />} />
-
-            <Route path="/admins" element={<AdminRoute />}>
-              <Route index element={<DishesPage />} />
-              <Route path="platos/nuevo" element={<NewDishPage />} />
-              <Route path="platos/:id" element={<EditDishPage />} />
-              <Route path="categorias" element={<CategoriesPage />} />
-              <Route path="equipo" element={<TeamPage />} />
-              {/* /admins/anything lands here, inside the layout, instead of
-                kicking the admin out of the panel. */}
-              <Route path="*" element={<NotFoundPage />} />
-            </Route>
-
-            <Route path="/404" element={<NotFoundPage />} />
-            {/* Rendered in place, without redirecting, to preserve the URL the
-              user typed. */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+          <Router />
         </Suspense>
-      </ErrorBoundary>
-    </BrowserRouter>
+      )}
+    </ErrorBoundary>
   );
 }
 

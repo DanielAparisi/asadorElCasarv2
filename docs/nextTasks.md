@@ -558,3 +558,44 @@ calles.
 Cómo comprobarlo cuando esté desplegado: pegar el enlace en un chat de WhatsApp
 (la vista previa) y pasar la URL por el *Rich Results Test* de Google (la
 ficha).
+
+---
+
+## 13. Rendimiento: lo que había detrás del 42 de Lighthouse — ✅ HECHO (03/09/2026)
+
+**~1 h**
+
+El informe que lo motivó estaba hecho sobre `localhost:5173`, es decir sobre el
+**servidor de desarrollo**: Vite sirve ahí los módulos sin empaquetar ni
+minificar y transforma cada archivo al vuelo, así que esa nota no es la de la
+web. La medición que vale es sobre `npm run build && npm run preview` — y de
+paso es el único sitio donde se ve la CSP, que es como lleva rota la tarea 0.1
+de `docs/cleanCode.md` desde que se escribió.
+
+Aun así, tres de las cosas que señalaba eran reales:
+
+- [x] **Las fuentes, al propio dominio.** Eran una hoja de Google Fonts en el
+      `head`: bloquea el pintado, obliga a abrir conexión con dos dominios más
+      antes de saber qué archivos pedir, y el titular saltaba al llegar Anton
+      (el grueso del CLS de 0,286). Ahora son ocho `.woff2` en `public/fonts`
+      con sus `@font-face` en `index.css`, y se precargan los dos del primer
+      pintado. Solo los subconjuntos `latin` y `latin-ext`; Space Grotesk es
+      variable, así que un archivo cubre de 400 a 700
+- [x] **La carta ya no salta al cargar.** Mientras llegan los platos se pintan
+      seis tarjetas vacías del tamaño final (`DishCardSkeleton`) en vez de una
+      línea de «Cargando…» que luego empujaba media página hacia abajo
+- [x] **El logo pesaba 77 kB para verse a 52 px** (906 × 906). Redimensionado a
+      160 × 160: 10 kB. `public/og.jpg` conserva el original, que ahí sí tiene
+      que ser grande
+- [x] **`width` y `height` en el logo**, que es lo que el navegador tiene antes
+      de que llegue el CSS
+- [x] **`supabase-js` fuera de la carta pública** (−54 kB gzip en la primera
+      carga). Ver `docs/arquitectura.md`: `useMenu()` pide sus dos tablas con
+      `fetch` al endpoint REST, que es lo que la librería habría enviado, y el
+      cliente se queda para el panel
+- [ ] **PENDIENTE** — volver a medir con Lighthouse sobre `npm run preview`, no
+      sobre `npm run dev`. Ese número es el primero que significa algo
+
+Lo que no se ha tocado y sigue siendo el techo: la landing se pinta entera desde
+JavaScript, así que el primer pintado espera a React. Bajar de ahí es
+prerenderizado, y eso es otra tarea y otra decisión.

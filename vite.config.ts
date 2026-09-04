@@ -114,13 +114,12 @@ function cspPlugin(supabaseUrl: string, jsonLdHash: string): Plugin {
     `script-src 'self' ${jsonLdHash}`,
     // Tailwind compiles to a file, but React injects inline styles in some
     // cases. The risk of an inline style is far lower.
-    // googleapis: the Google Fonts stylesheet (Anton, Space Grotesk, Space
-    // Mono). Without it the browser blocks it and the typography falls back.
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "style-src 'self' 'unsafe-inline'",
     // blob: and data: to preview photos before uploading them to Storage.
     `img-src 'self' data: blob: ${supabaseUrl}`,
-    // gstatic: the .woff2 files Google Fonts serves.
-    "font-src 'self' data: https://fonts.gstatic.com",
+    // The fonts are served from this same origin since they stopped coming
+    // from Google Fonts, so no third party needs to be allowed here.
+    "font-src 'self' data:",
     // The only network destination allowed: Supabase. wss for Realtime.
     `connect-src 'self' ${supabaseUrl} ${supabaseUrl.replace('https://', 'wss://')}`,
     // An injected form cannot post credentials to another domain.

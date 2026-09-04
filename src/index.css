@@ -1,5 +1,96 @@
 @import "tailwindcss";
 
+/* ---------- Las fuentes, servidas desde el propio dominio ----------
+   Antes venían de Google Fonts con un <link rel="stylesheet"> en el head, y
+   eso costaba tres cosas: la hoja bloquea el pintado, hay que abrir conexión
+   con dos dominios más (fonts.googleapis.com y fonts.gstatic.com) antes de
+   saber siquiera qué archivos pedir, y el titular en Anton saltaba al llegar
+   la fuente de verdad — el grueso del CLS.
+
+   Ahora los .woff2 están en `public/fonts/`, se precargan los dos que hacen
+   falta para el primer pintado (index.html) y la CSP ya no necesita permitir
+   ningún dominio de Google.
+
+   Solo los subconjuntos `latin` y `latin-ext`: el castellano entra entero en
+   el primero, y el navegador solo descarga el que necesita gracias a
+   `unicode-range`. Space Grotesk es una fuente variable, así que un único
+   archivo cubre de 400 a 700.
+
+   Actualizarlas es volver a bajarlas de Google Fonts; no cambian nunca solas,
+   que es justamente la gracia. */
+
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/anton-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/anton-400-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/space-mono-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/space-mono-400-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/space-mono-700-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/space-mono-700-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 /* `static` forces Tailwind to emit ALL tokens into the final CSS. Without that
    keyword it drops the ones no utility uses yet, and a hand-written
    `var(--color-cream)` would not resolve. The palette is the reference for the
@@ -33,9 +124,9 @@
   --color-line-dark: #3d3a37;  /* hairline on ink */
 
   /* ---------- Typography ----------
-     From the design repo. Loaded from Google Fonts in index.html; the
-     fallbacks are condensed system faces so the headline does not widen
-     while Anton is still on the wire. */
+     From the design repo. Served from `public/fonts` (see the @font-face
+     block at the top of this file); the fallbacks are condensed system faces
+     so the headline does not widen while Anton is still on the wire. */
   --font-title: Anton, Haettenschweiler, "Arial Narrow Bold", Impact, sans-serif;
   --font-body:  "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
   --font-mono:  "Space Mono", ui-monospace, SFMono-Regular, Consolas, monospace;

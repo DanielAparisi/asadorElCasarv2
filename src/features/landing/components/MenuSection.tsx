@@ -1,7 +1,7 @@
 import { useMenu } from '../../menu/hooks/useMenu'
 import { Heading } from '../../../shared/components/ui/Heading'
 import { Tag } from '../../../shared/components/ui/Tag'
-import DishCard from './DishCard'
+import DishCard, { DishCardSkeleton } from './DishCard'
 
 /**
  * The public menu: a grid of dishes with a photo, grouped by category.
@@ -28,7 +28,17 @@ function MenuSection() {
           without these two branches a network error leaves the menu blank for
           ever and says nothing. */}
       {loading ? (
-        <p className="font-mono text-xs tracking-[0.04em] text-ink-mute">Cargando la carta…</p>
+        <ul
+          className="grid grid-cols-3 gap-x-6.5 gap-y-11 m-0 p-0 list-none max-[900px]:grid-cols-2 max-[560px]:grid-cols-1"
+          // Announced once for screen readers, which get nothing out of six
+          // grey rectangles.
+          role="status"
+          aria-label="Cargando la carta"
+        >
+          {Array.from({ length: 6 }, (_, index) => (
+            <DishCardSkeleton key={index} />
+          ))}
+        </ul>
       ) : error ? (
         <p className="font-mono text-xs tracking-[0.04em] text-ink-mute">
           No hemos podido cargar la carta ahora mismo. Llámanos y te la contamos.

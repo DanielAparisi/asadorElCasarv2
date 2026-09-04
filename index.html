@@ -8,11 +8,19 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <!-- The panel must not show up in search engines. The public menu should,
          but that is controlled per route from the hosting, not here. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- The two faces the first paint needs, preloaded so they are already
+         there when the CSS asks for them: the headline in Anton and the body
+         in Space Grotesk. The rest (Space Mono, the -ext subsets) are fetched
+         only if the page turns out to need them. `crossorigin` is not
+         optional on a font preload — without it the browser downloads the
+         file twice. The @font-face rules live in src/index.css. -->
+    <link rel="preload" href="/fonts/anton-400-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="/fonts/space-grotesk-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
     <!-- The title, the description, the link preview and the business card are
          written here at build time from src/features/landing/seo.ts, which
