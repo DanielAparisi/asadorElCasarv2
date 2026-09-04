@@ -3,6 +3,7 @@ import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import {
+  buildLlmsTxt,
   buildRestaurantJsonLd,
   GEO_META,
   OG_IMAGE_PATH,
@@ -149,6 +150,36 @@ function cspPlugin(supabaseUrl: string, jsonLdHash: string): Plugin {
   }
 }
 
+/**
+ * Writes `llms.txt` at the root of the site.
+ *
+ * A static file in `public/` would have been one line instead of this, and it
+ * is exactly what this avoids: the opening hours and the address would have
+ * been typed a third time —after content.ts and the JSON-LD— and the third
+ * copy is the one that goes stale, because nobody remembers it exists.
+ *
+ * `configureServer` as well as `generateBundle` so that `npm run dev` serves
+ * the same file the deploy does. Otherwise the only way to check it is to
+ * build.
+ */
+function llmsTxtPlugin(siteUrl: string): Plugin {
+  const body = () => buildLlmsTxt(siteUrl)
+
+  return {
+    name: 'llms-txt',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.split('?')[0] !== '/llms.txt') return next()
+        res.setHeader('Content-Type', 'text/markdown; charset=utf-8')
+        res.end(body())
+      })
+    },
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'llms.txt', source: body() })
+    },
+  }
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const supabaseUrl = env.VITE_SUPABASE_URL?.replace(/['"]/g, '') ?? ''
@@ -167,6 +198,7 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       headPlugin(siteUrl, supabaseUrl, jsonLd),
       cspPlugin(supabaseUrl, jsonLdHash),
+      llmsTxtPlugin(siteUrl),
     ],
   }
 })

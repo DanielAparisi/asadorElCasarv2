@@ -1,5 +1,6 @@
 import {
   ADDRESS,
+  ADDRESS_EXTRA,
   FACEBOOK_URL,
   INSTAGRAM_URL,
   LATITUDE,
@@ -7,10 +8,12 @@ import {
   LONGITUDE,
   MAPS_DIRECTIONS_URL,
   PHONE_HREF,
+  PHONE_NUMBER,
   POSTAL_CODE,
   REGION,
   REGION_CODE,
   WEEKLY_SCHEDULE,
+  WHATSAPP_URL,
 // The `.ts` is not a slip: this module is also compiled by tsconfig.node.json
 // —vite.config.ts imports it to write the tags into index.html— and Node's
 // module resolution demands the extension. It is the only file in the project
@@ -146,4 +149,80 @@ export function buildRestaurantJsonLd(siteUrl: string) {
       }),
     ),
   }
+}
+
+/**
+ * `llms.txt`: the site explained to a language model, in Markdown.
+ *
+ * Same problem as the meta tags, different reader. An assistant asked "what
+ * time does the asador in El Casar open" arrives at a page that paints
+ * everything from JavaScript and, if it reads at all, reads the HTML. This
+ * file hands it the answer in plain text: hours, address, phone, and how
+ * ordering actually works.
+ *
+ * It is generated and not written by hand for the reason seo.ts exists at all
+ * — the hours and the address already live in content.ts, and a third copy is
+ * a third thing to forget when the grill changes its Friday.
+ *
+ * The format is the llms.txt convention: an H1 with the name, a blockquote
+ * with the summary, prose, and H2 sections. The H1 is the one part that is not
+ * optional.
+ *
+ * The dishes are deliberately absent: they live in Supabase and change. What
+ * is here is what does not.
+ */
+export function buildLlmsTxt(siteUrl: string): string {
+  // Absolute while there is a domain, in-page anchors otherwise. Same rule as
+  // the canonical tag: a relative link is worth less than an absolute one, but
+  // an absolute link to a domain that is not yet ours is simply wrong.
+  const link = (anchor: string) => `${siteUrl}/${anchor}`
+
+  const schedule = WEEKLY_SCHEDULE.map(
+    ({ day, slots }) =>
+      `- **${day}**: ${slots.map((slot) => `${slot.label.toLowerCase()} ${slot.hours}`).join(' y ')}`,
+  )
+
+  // The closed day is said out loud rather than left to be inferred from the
+  // days that are missing from the list.
+  const closedDays = Object.keys(DAY_OF_WEEK).filter(
+    (day) => !WEEKLY_SCHEDULE.some((entry) => entry.day === day),
+  )
+
+  return `# ${SITE_NAME}
+
+> ${SITE_DESCRIPTION}
+
+Asador de barrio en ${LOCALITY} (${REGION}). La especialidad es el pollo a la
+brasa; también costillas y comida casera.
+
+Es comida para llevar y recoger en el local: no hay reparto a domicilio. Los
+pedidos se encargan por teléfono o por WhatsApp, se acuerda la hora de recogida
+y se pagan al recogerlos.
+
+## Datos
+
+- **Dirección**: ${ADDRESS}, ${ADDRESS_EXTRA}, ${POSTAL_CODE} ${LOCALITY}, ${REGION}
+- **Teléfono y WhatsApp**: ${PHONE_NUMBER} (${PHONE_HREF.replace('tel:', '')})
+- **Precio medio**: €
+- **Reservas**: sí, por teléfono o WhatsApp
+
+## Horario
+
+${schedule.join('\n')}
+${closedDays.map((day) => `- **${day}**: cerrado`).join('\n')}
+
+## Secciones
+
+- [La carta](${link('#la-carta')}): platos y precios. Se actualiza desde el panel del restaurante, así que la página es la única fuente al día.
+- [Horario](${link('#horario')}): el horario de arriba, en la página.
+- [Reservas](${link('#reservas')}): cómo encargar, paso a paso.
+- [Dónde estamos](${link('#donde-estamos')}): mapa y cómo llegar.
+
+## Enlaces
+
+- [WhatsApp](${WHATSAPP_URL}): la vía más rápida para encargar.
+- [Cómo llegar](${MAPS_DIRECTIONS_URL}): indicaciones en Google Maps.
+- [Instagram](${INSTAGRAM_URL})
+- [Facebook](${FACEBOOK_URL})
+`
 }
