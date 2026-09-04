@@ -12,9 +12,31 @@ cliente y Supabase como backend (base de datos y autenticación).
 
 ```bash
 npm install
-cp .env.example .env   # y rellena los valores del proyecto de Supabase
 npm run dev
 ```
+
+Antes del primer arranque hace falta un archivo `.env` en la raíz. No se sube
+al repo, y sin él la app se niega a arrancar con un error que dice cuál falta.
+
+```bash
+# Supabase → Project Settings → API
+VITE_SUPABASE_URL=https://tu-proyecto.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=
+
+# El dominio público, sin barra final. Vacío hasta que se despliegue.
+VITE_SITE_URL=
+```
+
+Las tres son `VITE_`, y eso significa que acaban en el bundle y son públicas:
+en una app 100 % cliente todo lo que Vite inyecta se puede leer desde el
+navegador. Lo que protege los datos es RLS, no el secreto de la clave.
+Cualquier valor que sí deba seguir siendo secreto va en una Edge Function,
+nunca aquí.
+
+`VITE_SITE_URL` es opcional y hoy está vacía a propósito: de ella cuelgan el
+`canonical`, la vista previa del enlace en WhatsApp y la ficha de Google. Si no
+hay dominio, esas etiquetas no se escriben —mejor eso que un dominio inventado,
+porque una URL equivocada rompe la vista previa para todo el mundo.
 
 ## Idioma del proyecto
 

@@ -15,8 +15,14 @@ export const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABL
 // Without this, a missing .env reaches `createClient` as undefined and the
 // failure shows up later, in the first query, with a message that never
 // mentions the variable that is missing (docs/cleanCode.md §6).
+//
+// The message spells the fix out rather than pointing at a template file: the
+// reader is someone whose app just refused to start, and the two values plus
+// where to find them is shorter than the round trip through another file.
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   throw new Error(
-    'Faltan VITE_SUPABASE_URL y/o VITE_SUPABASE_PUBLISHABLE_KEY. Copia .env.example a .env',
+    'Faltan VITE_SUPABASE_URL y/o VITE_SUPABASE_PUBLISHABLE_KEY. ' +
+      'Créalas en un archivo `.env` en la raíz del proyecto con los valores de ' +
+      'Supabase → Project Settings → API.',
   )
 }

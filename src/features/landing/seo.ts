@@ -94,7 +94,7 @@ const DAY_OF_WEEK: Record<string, string> = {
  *
  * This is what feeds the Google card with the address, the phone number and
  * the opening hours. `siteUrl` is empty until the site has a domain (see
- * VITE_SITE_URL in .env.example): the fields that need an absolute URL are
+ * VITE_SITE_URL in .env): the fields that need an absolute URL are
  * left out rather than filled with a guess, because a wrong `url` is worse
  * than a missing one.
  */

@@ -238,15 +238,25 @@ export const supabase = createClient(supabaseUrl, supabasePublishableKey)
 
 Si falta el `.env`, `createClient` recibe `undefined` y el fallo aparece más
 tarde, en la primera consulta, con un mensaje que no menciona la variable que
-falta. Alguien clona el repo, se salta el `.env.example` y pierde media hora.
+falta. Alguien clona el repo, se salta el paso del `.env` y pierde media hora.
 
 ```ts
 if (!supabaseUrl || !supabasePublishableKey) {
-  throw new Error('Faltan VITE_SUPABASE_URL y/o VITE_SUPABASE_PUBLISHABLE_KEY. Copia .env.example a .env')
+  throw new Error(
+    'Faltan VITE_SUPABASE_URL y/o VITE_SUPABASE_PUBLISHABLE_KEY. ' +
+      'Créalas en un archivo `.env` en la raíz del proyecto con los valores de ' +
+      'Supabase → Project Settings → API.',
+  )
 }
 ```
 
 Cuatro líneas que convierten un misterio en una instrucción.
+
+El mensaje deletrea el arreglo en vez de remitir a una plantilla. Hubo un
+`.env.example` que hacía ese papel y se eliminó: quien lee esto es alguien a
+quien la app acaba de negarse a arrancar, y nombrar las dos variables y dónde
+se sacan es más corto que el viaje de ida y vuelta a otro archivo. La plantilla
+vive ahora en el README, que es donde se busca antes de arrancar, no después.
 
 Nota de contexto: `vite.config.ts` ya hace `?? ''` para lo suyo, así que la
 build no revienta sin las variables — y el CI lo aprovecha a propósito. Esta

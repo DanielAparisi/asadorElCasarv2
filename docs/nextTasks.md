@@ -143,7 +143,9 @@ proyecto 100 % cliente no tiene dónde usarse sin acabar filtrada en el bundle.
 - [x] Si algún día hace falta, va en una Edge Function, nunca en el cliente
 - [x] Añadido `.env.example` con las dos variables `VITE_` y sin secretos — el
       `.gitignore` ya lo tenía previsto (`!.env.example`) pero el archivo no
-      existía
+      existía. **Revertido después**: el archivo se eliminó y las variables
+      pasaron a documentarse en el README, que es lo que se lee antes de
+      arrancar. La negación `!.env.example` salió del `.gitignore` con él
 
 No había ningún uso de `PRIVATE_API_KEY` en el código.
 

@@ -56,8 +56,8 @@ asadorElCasarv1/
 ├── vite.config.ts              React + Tailwind + plugins de SEO y CSP
 ├── eslint.config.js
 ├── tsconfig.{json,app,node}.json
-├── .env                        no se sube (VITE_SUPABASE_URL, ..._PUBLISHABLE_KEY)
-├── .env.example                plantilla sin secretos
+├── .env                        no se sube (VITE_SUPABASE_URL, ..._PUBLISHABLE_KEY,
+│                               VITE_SITE_URL). Las documenta el README
 │
 ├── public/                     favicon.svg, icons.svg
 │
