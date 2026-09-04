@@ -61,11 +61,15 @@ function SiteFooter() {
           </div>
         </div>
 
+        {/* `on-dark-mute` and not `ink-mute`: the two are the same grey in
+            intent, but `ink-mute` is mixed for paper and on this ink
+            background it drops to 3.56:1, under the 4.5 AA asks of 12px text.
+            `on-dark-mute` is the one the palette defines for exactly this. */}
         <div className="flex items-center justify-between gap-4 flex-wrap pt-5.5 border-t-2 border-line-dark">
-          <p className="m-0 font-mono text-xs tracking-[0.05em] text-ink-mute">
+          <p className="m-0 font-mono text-xs tracking-[0.05em] text-on-dark-mute">
             © 2026 Asador El Casar · Comida para llevar
           </p>
-          <p className="m-0 font-mono text-xs tracking-[0.05em] text-ink-mute">
+          <p className="m-0 font-mono text-xs tracking-[0.05em] text-on-dark-mute">
             {ADDRESS} · {LOCALITY}, {POSTAL_CODE}
           </p>
         </div>
