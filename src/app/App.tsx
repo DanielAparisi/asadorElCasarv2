@@ -26,7 +26,7 @@ const Router = lazy(() => import("./Router"));
  * `BrowserRouter` above them and they throw. That is why shared/ui/Brand links
  * home with a plain anchor.
  */
-const isLanding = window.location.pathname === "/";
+export const isLanding = window.location.pathname === "/";
 
 function App() {
   return (
