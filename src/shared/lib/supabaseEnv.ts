@@ -10,7 +10,8 @@
  * ends up in the bundle. What protects the data is RLS, not secrecy.
  */
 export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
-export const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+export const SUPABASE_PUBLISHABLE_KEY = import.meta.env
+  .VITE_SUPABASE_PUBLISHABLE_KEY
 
 // Without this, a missing .env reaches `createClient` as undefined and the
 // failure shows up later, in the first query, with a message that never

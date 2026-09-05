@@ -38,8 +38,8 @@ function TeamPage() {
       <form onSubmit={handleSubmit} className="max-w-sm border-t pt-6">
         <h2 className="font-semibold mb-1">Dar acceso a alguien</h2>
         <p className="text-sm text-gray-600 mb-3">
-          La persona tiene que haberse registrado antes: aquí solo se le da el permiso de admin, no
-          se le crea la cuenta.
+          La persona tiene que haberse registrado antes: aquí solo se le da el
+          permiso de admin, no se le crea la cuenta.
         </p>
 
         <div className="flex gap-2">

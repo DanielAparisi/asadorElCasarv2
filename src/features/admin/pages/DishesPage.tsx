@@ -14,7 +14,8 @@ import AdminHeading from '../components/AdminHeading'
  * here and it should not require opening the dish.
  */
 function DishesPage() {
-  const { dishes, loading, error, toggleAvailable, saving, saveError } = useDishes()
+  const { dishes, loading, error, toggleAvailable, saving, saveError } =
+    useDishes()
   const categories = useCategories()
 
   return (
@@ -36,7 +37,9 @@ function DishesPage() {
       ) : error || categories.error ? (
         <p>Error: {error ?? categories.error}</p>
       ) : dishes.length === 0 ? (
-        <p className="text-gray-500">Todavía no hay platos. Añade el primero.</p>
+        <p className="text-gray-500">
+          Todavía no hay platos. Añade el primero.
+        </p>
       ) : (
         categories.categories.map((category) => (
           <section key={category.id} className="mb-8">
@@ -52,16 +55,23 @@ function DishesPage() {
                       dish.available ? '' : 'opacity-50'
                     }`}
                   >
-                    <Link to={`/admins/platos/${dish.id}`} className="underline">
+                    <Link
+                      to={`/admins/platos/${dish.id}`}
+                      className="underline"
+                    >
                       {dish.name}
                     </Link>
-                    <span className="ml-auto tabular-nums">{formatPrice(dish.price_cents)}</span>
+                    <span className="ml-auto tabular-nums">
+                      {formatPrice(dish.price_cents)}
+                    </span>
                     <AdminButton
                       variant="quiet"
                       disabled={saving}
                       onClick={() => toggleAvailable(dish.id)}
                     >
-                      {dish.available ? 'Quitar de la carta' : 'Poner en la carta'}
+                      {dish.available
+                        ? 'Quitar de la carta'
+                        : 'Poner en la carta'}
                     </AdminButton>
                   </li>
                 ))}

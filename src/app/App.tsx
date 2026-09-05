@@ -1,9 +1,9 @@
-import { lazy, Suspense } from "react";
-import HomePage from "../features/landing/pages/HomePage";
-import ErrorBoundary from "../shared/components/ErrorBoundary";
-import Spinner from "../shared/components/Spinner";
+import { lazy, Suspense } from 'react'
+import HomePage from '../features/landing/pages/HomePage'
+import ErrorBoundary from '../shared/components/ErrorBoundary'
+import Spinner from '../shared/components/Spinner'
 
-const Router = lazy(() => import("./Router"));
+const Router = lazy(() => import('./Router'))
 
 /**
  * `/` is served without a router at all.
@@ -26,7 +26,7 @@ const Router = lazy(() => import("./Router"));
  * `BrowserRouter` above them and they throw. That is why shared/ui/Brand links
  * home with a plain anchor.
  */
-export const isLanding = window.location.pathname === "/";
+export const isLanding = window.location.pathname === '/'
 
 function App() {
   return (
@@ -42,7 +42,7 @@ function App() {
         </Suspense>
       )}
     </ErrorBoundary>
-  );
+  )
 }
 
-export default App;
+export default App

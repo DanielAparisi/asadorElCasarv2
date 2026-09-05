@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Category, Dish } from '@/features/menu/types'
-import { centsToPriceInput, parsePriceToCents } from '@/features/menu/formatPrice'
+import {
+  centsToPriceInput,
+  parsePriceToCents,
+} from '@/features/menu/formatPrice'
 import type { DishInput } from '../hooks/useDishes'
 import AdminButton from './AdminButton'
 import AdminField from './AdminField'
@@ -35,11 +38,17 @@ function DishForm({
   const [name, setName] = useState(dish?.name ?? '')
   const [description, setDescription] = useState(dish?.description ?? '')
   // Euros as typed, cents on save: the conversion lives in menu/formatPrice.
-  const [price, setPrice] = useState(dish ? centsToPriceInput(dish.price_cents) : '')
-  const [categoryId, setCategoryId] = useState(dish?.category_id ?? categories[0]?.id)
+  const [price, setPrice] = useState(
+    dish ? centsToPriceInput(dish.price_cents) : '',
+  )
+  const [categoryId, setCategoryId] = useState(
+    dish?.category_id ?? categories[0]?.id,
+  )
   const [sortOrder, setSortOrder] = useState(String(dish?.sort_order ?? 0))
   const [available, setAvailable] = useState(dish?.available ?? true)
-  const [photoPath, setPhotoPath] = useState<string | null>(dish?.photo_path ?? null)
+  const [photoPath, setPhotoPath] = useState<string | null>(
+    dish?.photo_path ?? null,
+  )
   const [priceError, setPriceError] = useState<string | null>(null)
 
   if (categories.length === 0) {
@@ -78,7 +87,11 @@ function DishForm({
   return (
     <form onSubmit={handleSubmit} className="max-w-md">
       <AdminField label="Nombre">
-        <AdminInput required value={name} onChange={(event) => setName(event.target.value)} />
+        <AdminInput
+          required
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
       </AdminField>
 
       <AdminField label="Descripción">

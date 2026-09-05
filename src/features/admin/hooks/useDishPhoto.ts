@@ -38,7 +38,9 @@ export function useDishPhoto() {
 
       return path
     } catch (cause) {
-      setUploadError(cause instanceof Error ? cause.message : 'No se pudo subir la foto.')
+      setUploadError(
+        cause instanceof Error ? cause.message : 'No se pudo subir la foto.',
+      )
       return null
     } finally {
       setUploading(false)

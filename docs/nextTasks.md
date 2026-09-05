@@ -769,7 +769,7 @@ habría sido el sitio donde un alias a medias fallaría.
 
 ---
 
-## 22. Prettier en el CI
+## 22. Prettier en el CI — ✅ HECHO (05/09/2026)
 
 **~15 min · viene de `docs/cleanCode.md` §8**
 
@@ -777,11 +777,35 @@ El CI corre `lint` y `build`. El formato no lo revisa nadie, y se nota: hay
 ficheros con comillas simples y ficheros con dobles, `main.tsx` sin punto y coma
 y el resto con él.
 
-- [ ] Prettier como dependencia de desarrollo, con su `.prettierrc`
-- [ ] `npm run format` y `npm run format:check`
-- [ ] Un paso de `format:check` en `ci.yml`
-- [ ] Pasarlo una vez sobre todo el repo, en un commit **solo de formato**, para
-      que el ruido no se mezcle con ningún cambio real
+- [x] `prettier` como dependencia de desarrollo, **fijado a la versión exacta**
+      (3.9.6, sin `^`): un rango dejaría que el CI empezase a fallar solo el día
+      que una release mueva un salto de línea
+- [x] `.prettierrc.json` con lo que ya se usaba, no con los defaults:
+      `semi: false` y `singleQuote: true` (145 importaciones con comilla simple
+      frente a 11 con doble) y `printWidth: 80`, que es donde ya estaban
+      envueltos los comentarios — el p90 de las líneas del repo era 77
+- [x] `npm run format` y `npm run format:check`
+- [x] `format:check` en `ci.yml`, **antes** del build: es el fallo más barato y
+      el de arreglo más obvio
+- [x] Pasado una vez sobre todo el repo: 45 ficheros de `src/`, más
+      `index.html`, `vite.config.ts` y `scripts/prerender.mjs`
+
+`.prettierignore` es la mitad menos obvia de esto y lo que evita tres problemas
+distintos:
+
+- **`docs/` y el resto de `*.md` fuera.** Prettier rehace los párrafos y las
+  tablas, y eso convierte cualquier edición futura de la documentación en un
+  diff ilegible. Es prosa, no código.
+- **`.claude/` y `.agents/` fuera.** Son ficheros instalados de fuera; la
+  primera pasada reformateó 24 000 líneas de catálogos de fuentes e iconos que
+  no son de este repo. Formatearlos convierte cada actualización de upstream en
+  un conflicto.
+- **`supabase/.temp/` y `package-lock.json` fuera.** No los escribe una persona.
+
+Comprobado que `npm run lint`, `npm run format:check` y `npm run build` —los tres
+pasos del CI, en ese orden— pasan sobre el árbol ya formateado, prerenderizado
+incluido: el reformateo tocó `index.html`, y `scripts/prerender.mjs` busca ahí
+la cadena exacta `<div id="root"></div>` para inyectar el HTML.
 
 ---
 

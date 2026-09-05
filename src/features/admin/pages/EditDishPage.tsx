@@ -16,14 +16,16 @@ import type { DishInput } from '../hooks/useDishes'
  */
 function EditDishPage() {
   const { id } = useParams()
-  const { dishes, loading, error, updateDish, deleteDish, saving, saveError } = useDishes()
+  const { dishes, loading, error, updateDish, deleteDish, saving, saveError } =
+    useDishes()
   const categories = useCategories()
   const navigate = useNavigate()
 
   const dish = dishes.find((candidate) => String(candidate.id) === id)
 
   if (loading || categories.loading) return <p>Cargando…</p>
-  if (error || categories.error) return <p>Error: {error ?? categories.error}</p>
+  if (error || categories.error)
+    return <p>Error: {error ?? categories.error}</p>
   // An id that does not exist is a 404, not an empty form that would silently
   // create a second dish on save.
   if (!dish) return <NotFoundPage />
@@ -41,7 +43,12 @@ function EditDishPage() {
    * switch in the list. Hence: down here, and with a confirmation.
    */
   const handleDelete = async () => {
-    if (!confirm(`¿Borrar "${dish.name}" para siempre? Esto no se puede deshacer.`)) return
+    if (
+      !confirm(
+        `¿Borrar "${dish.name}" para siempre? Esto no se puede deshacer.`,
+      )
+    )
+      return
     const deleted = await deleteDish(dish.id)
     if (deleted) navigate('/admins')
   }
@@ -64,7 +71,12 @@ function EditDishPage() {
         saveError={saveError}
       >
         <div className="border-t mt-8 pt-4">
-          <AdminButton type="button" variant="quiet" disabled={saving} onClick={handleDelete}>
+          <AdminButton
+            type="button"
+            variant="quiet"
+            disabled={saving}
+            onClick={handleDelete}
+          >
             Borrar este plato
           </AdminButton>
           <p className="text-sm text-gray-500 mt-2">

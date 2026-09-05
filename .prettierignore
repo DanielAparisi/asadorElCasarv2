@@ -1,0 +1,21 @@
+# Build output and dependencies.
+dist
+node_modules
+
+# Not written by hand: it is the lockfile, and npm rewrites it its own way.
+package-lock.json
+
+# Prose. Prettier reflows Markdown paragraphs and rewrites the tables, which
+# turns any later edit to docs/ into a diff nobody can read.
+*.md
+
+# Copied from the font foundry / generated. Reformatting them only adds noise.
+public
+
+# The Supabase CLI's scratch dir. Git ignores it too; it is not ours to format.
+supabase/.temp
+
+# Vendored: skills and agent definitions installed from elsewhere. Formatting
+# them makes every update from upstream a conflict.
+.claude
+.agents

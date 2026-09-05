@@ -39,8 +39,8 @@ function HeroSection() {
           </h1>
 
           <Lead>
-            Asador de pollos y comida para llevar en El Casar. Recetas caseras y productos de
-            primera calidad, para comer en familia o llevar a casa.
+            Asador de pollos y comida para llevar en El Casar. Recetas caseras y
+            productos de primera calidad, para comer en familia o llevar a casa.
           </Lead>
 
           <div className="flex gap-4.5 flex-wrap mt-1.5">

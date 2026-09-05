@@ -71,12 +71,18 @@ function LoginForm() {
             disabled={submitting}
             className="bg-gray-800 text-white rounded py-2 disabled:opacity-50"
           >
-            {submitting ? 'Enviando…' : mode === 'signIn' ? 'Entrar' : 'Crear cuenta'}
+            {submitting
+              ? 'Enviando…'
+              : mode === 'signIn'
+                ? 'Entrar'
+                : 'Crear cuenta'}
           </button>
         </form>
 
         <p className="mt-4 text-sm">
-          {mode === 'signIn' ? '¿Aún no tienes cuenta? ' : '¿Ya tienes cuenta? '}
+          {mode === 'signIn'
+            ? '¿Aún no tienes cuenta? '
+            : '¿Ya tienes cuenta? '}
           <button type="button" onClick={toggleMode} className="underline">
             {mode === 'signIn' ? 'Regístrate' : 'Inicia sesión'}
           </button>
@@ -85,7 +91,8 @@ function LoginForm() {
         {/* Signing up does not grant panel access: an admin grants it by hand
             from /admins. */}
         <p className="mt-3 text-xs text-gray-500">
-          El acceso de administrador se concede a mano. Si lo necesitas, escribe a{' '}
+          El acceso de administrador se concede a mano. Si lo necesitas, escribe
+          a{' '}
           <a href={`mailto:${ACCESS_REQUESTS_EMAIL}`} className="underline">
             {ACCESS_REQUESTS_EMAIL}
           </a>

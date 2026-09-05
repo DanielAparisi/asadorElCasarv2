@@ -1,4 +1,11 @@
-import { ADDRESS, LOCALITY, NAV_LINKS, PHONE_NUMBER, POSTAL_CODE, WHATSAPP_URL } from '../content'
+import {
+  ADDRESS,
+  LOCALITY,
+  NAV_LINKS,
+  PHONE_NUMBER,
+  POSTAL_CODE,
+  WHATSAPP_URL,
+} from '../content'
 import { SocialLinks } from './SocialLinks'
 import { BUTTON_ON_INK, Button } from '@/shared/components/ui/Button'
 import { Brand } from '@/shared/components/ui/Brand'

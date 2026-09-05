@@ -24,8 +24,9 @@ function OrderSection() {
         </h2>
 
         <Lead inverted>
-          Haz tu pedido por WhatsApp o por teléfono y te decimos la hora de recogida. Para fines de
-          semana y festivos, mejor con un día de antelación: la parrilla se llena pronto.
+          Haz tu pedido por WhatsApp o por teléfono y te decimos la hora de
+          recogida. Para fines de semana y festivos, mejor con un día de
+          antelación: la parrilla se llena pronto.
         </Lead>
 
         <div className="flex gap-4 flex-wrap mt-2">
@@ -57,7 +58,9 @@ function OrderSection() {
             <p className="m-0 font-title text-[1.375rem] tracking-[0.03em] uppercase text-bg">
               {step.title}
             </p>
-            <p className="m-0 text-[0.9375rem] leading-[1.6] text-on-dark">{step.text}</p>
+            <p className="m-0 text-[0.9375rem] leading-[1.6] text-on-dark">
+              {step.text}
+            </p>
           </li>
         ))}
       </ol>

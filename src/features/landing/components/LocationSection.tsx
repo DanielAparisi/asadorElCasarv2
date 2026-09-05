@@ -14,7 +14,13 @@ import { SectionHeading } from '@/shared/components/ui/Heading'
 import { POSTER_BORDER } from '@/shared/components/ui/tokens'
 
 /** Red mono label heading each detail. */
-function Detail({ label, children }: { label: string; children: React.ReactNode }) {
+function Detail({
+  label,
+  children,
+}: {
+  label: string
+  children: React.ReactNode
+}) {
   return (
     <div>
       <p className="m-0 mb-1 font-mono text-xs font-bold uppercase tracking-[0.16em] text-red-dark">

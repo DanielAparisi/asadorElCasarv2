@@ -42,7 +42,9 @@ function SiteHeader() {
             bg-red text-white transition-colors hover:bg-red-dark"
         >
           <PhoneIcon />
-          <span className="font-title text-[1.1875rem] tracking-[0.05em]">{PHONE_NUMBER}</span>
+          <span className="font-title text-[1.1875rem] tracking-[0.05em]">
+            {PHONE_NUMBER}
+          </span>
         </a>
       </div>
     </header>

@@ -9,7 +9,13 @@ type ButtonProps = {
   children: React.ReactNode
 } & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
 
-export function Button({ variant, href, className = '', children, ...props }: ButtonProps) {
+export function Button({
+  variant,
+  href,
+  className = '',
+  children,
+  ...props
+}: ButtonProps) {
   const base = `inline-flex items-center justify-center px-6.5 py-4 rounded-[2px] ${POSTER_BORDER}
     text-[1.0625rem] font-bold uppercase tracking-[0.04em] leading-tight whitespace-nowrap
     transition-[transform,box-shadow,background-color,color] duration-150
@@ -28,7 +34,11 @@ export function Button({ variant, href, className = '', children, ...props }: Bu
   }
 
   return (
-    <a href={href} className={`${base} ${variants[variant]} ${className}`} {...props}>
+    <a
+      href={href}
+      className={`${base} ${variants[variant]} ${className}`}
+      {...props}
+    >
       {children}
     </a>
   )

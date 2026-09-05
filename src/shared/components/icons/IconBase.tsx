@@ -11,7 +11,13 @@
  */
 function IconBase({ children }: { children: React.ReactNode }) {
   return (
-    <svg aria-hidden="true" className="w-5 h-5 flex-none block" viewBox="0 0 24 24">{children}</svg>
+    <svg
+      aria-hidden="true"
+      className="w-5 h-5 flex-none block"
+      viewBox="0 0 24 24"
+    >
+      {children}
+    </svg>
   )
 }
 

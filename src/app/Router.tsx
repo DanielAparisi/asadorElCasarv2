@@ -1,8 +1,8 @@
-import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import HomePage from "../features/landing/pages/HomePage";
-import NotFoundPage from "../shared/pages/NotFoundPage";
-import Spinner from "../shared/components/Spinner";
+import { lazy, Suspense } from 'react'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import HomePage from '../features/landing/pages/HomePage'
+import NotFoundPage from '../shared/pages/NotFoundPage'
+import Spinner from '../shared/components/Spinner'
 
 // Everything private is loaded separately. Three or four people use it; there
 // is no reason for every visitor of the restaurant to download the admin panel
@@ -10,22 +10,22 @@ import Spinner from "../shared/components/Spinner";
 // auth/ProtectedRoutes and not here: if this module imported the session
 // hooks, Supabase would go straight back into this chunk.
 const LoginRoute = lazy(() =>
-  import("../features/auth/components/ProtectedRoutes").then((m) => ({
+  import('../features/auth/components/ProtectedRoutes').then((m) => ({
     default: m.LoginRoute,
   })),
-);
+)
 const AdminRoute = lazy(() =>
-  import("../features/auth/components/ProtectedRoutes").then((m) => ({
+  import('../features/auth/components/ProtectedRoutes').then((m) => ({
     default: m.AdminRoute,
   })),
-);
-const DishesPage = lazy(() => import("../features/admin/pages/DishesPage"));
-const NewDishPage = lazy(() => import("../features/admin/pages/NewDishPage"));
-const EditDishPage = lazy(() => import("../features/admin/pages/EditDishPage"));
+)
+const DishesPage = lazy(() => import('../features/admin/pages/DishesPage'))
+const NewDishPage = lazy(() => import('../features/admin/pages/NewDishPage'))
+const EditDishPage = lazy(() => import('../features/admin/pages/EditDishPage'))
 const CategoriesPage = lazy(
-  () => import("../features/admin/pages/CategoriesPage"),
-);
-const TeamPage = lazy(() => import("../features/admin/pages/TeamPage"));
+  () => import('../features/admin/pages/CategoriesPage'),
+)
+const TeamPage = lazy(() => import('../features/admin/pages/TeamPage'))
 
 /**
  * The router, and everything only reachable through it.
@@ -62,7 +62,7 @@ function Router() {
         </Routes>
       </Suspense>
     </BrowserRouter>
-  );
+  )
 }
 
-export default Router;
+export default Router

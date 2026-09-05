@@ -73,7 +73,11 @@ export function useDishes() {
     setSaving(true)
     setSaveError(null)
 
-    const { data, error } = await supabase.from('dishes').insert(dish).select(COLUMNS).single()
+    const { data, error } = await supabase
+      .from('dishes')
+      .insert(dish)
+      .select(COLUMNS)
+      .single()
     setSaving(false)
 
     if (error) {
@@ -92,7 +96,8 @@ export function useDishes() {
 
     // Read before writing: after the update the old path is gone from the row
     // and there is no way left to find the file it pointed at.
-    const previousPhoto = dishes.find((dish) => dish.id === id)?.photo_path ?? null
+    const previousPhoto =
+      dishes.find((dish) => dish.id === id)?.photo_path ?? null
 
     const { data, error } = await supabase
       .from('dishes')
@@ -108,7 +113,9 @@ export function useDishes() {
     }
 
     const updated = data as Dish
-    setDishes((previous) => previous.map((dish) => (dish.id === id ? updated : dish)))
+    setDishes((previous) =>
+      previous.map((dish) => (dish.id === id ? updated : dish)),
+    )
 
     // The replaced photo, deleted only once the row no longer points at it.
     // The other order —delete first, save second— loses the photo whenever the

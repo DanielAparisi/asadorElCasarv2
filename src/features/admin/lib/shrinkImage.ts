@@ -25,7 +25,9 @@ export async function shrinkImage(file: File): Promise<Blob> {
   // a canvas ignores that, so without this every photo taken in portrait is
   // uploaded lying on its side. The bug is invisible in testing because the
   // pictures dragged in from a laptop have no EXIF to begin with.
-  const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
+  const bitmap = await createImageBitmap(file, {
+    imageOrientation: 'from-image',
+  })
 
   // Never upscale: a small photo stays the size it is rather than being blown
   // up into a blurry 800 px one.

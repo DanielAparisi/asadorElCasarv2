@@ -41,17 +41,23 @@ function MenuSection() {
         </ul>
       ) : error ? (
         <p className="font-mono text-xs tracking-[0.04em] text-ink-mute">
-          No hemos podido cargar la carta ahora mismo. Llámanos y te la contamos.
+          No hemos podido cargar la carta ahora mismo. Llámanos y te la
+          contamos.
         </p>
       ) : (
         categories.map((category) => {
-          const dishesOfCategory = dishes.filter((dish) => dish.category_id === category.id)
+          const dishesOfCategory = dishes.filter(
+            (dish) => dish.category_id === category.id,
+          )
           // An empty category is a category whose dishes are all off the menu:
           // its heading alone would look like something failed to load.
           if (dishesOfCategory.length === 0) return null
 
           return (
-            <div key={category.id} className="mb-14 last:mb-0 max-[900px]:mb-11">
+            <div
+              key={category.id}
+              className="mb-14 last:mb-0 max-[900px]:mb-11"
+            >
               <h3 className="font-mono text-xs font-bold uppercase tracking-[0.18em] text-ink border-t-[3px] border-ink pt-3 mb-7">
                 {category.name}
               </h3>

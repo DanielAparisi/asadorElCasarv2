@@ -40,7 +40,8 @@ const HEADERS = {
   Accept: 'application/json',
 }
 
-const DISH_COLUMNS = 'id,name,description,price_cents,category_id,sort_order,available,photo_path'
+const DISH_COLUMNS =
+  'id,name,description,price_cents,category_id,sort_order,available,photo_path'
 
 async function select<T>(path: string, signal: AbortSignal): Promise<T> {
   const response = await fetch(`${REST}/${path}`, { headers: HEADERS, signal })
@@ -69,8 +70,14 @@ export function useMenu() {
         // Both at once: they do not depend on each other, and the menu is not
         // painted until both have arrived anyway.
         const [categoryRows, dishRows] = await Promise.all([
-          select<Category[]>('categories?select=id,name,sort_order&order=sort_order', controller.signal),
-          select<Dish[]>(`dishes?select=${DISH_COLUMNS}&order=sort_order`, controller.signal),
+          select<Category[]>(
+            'categories?select=id,name,sort_order&order=sort_order',
+            controller.signal,
+          ),
+          select<Dish[]>(
+            `dishes?select=${DISH_COLUMNS}&order=sort_order`,
+            controller.signal,
+          ),
         ])
 
         setCategories(categoryRows)
@@ -83,7 +90,9 @@ export function useMenu() {
       } catch (cause) {
         // An abort is not a failure: the component simply went away.
         if (controller.signal.aborted) return
-        setError(cause instanceof Error ? cause.message : 'No se pudo cargar la carta')
+        setError(
+          cause instanceof Error ? cause.message : 'No se pudo cargar la carta',
+        )
       }
 
       if (!controller.signal.aborted) setLoading(false)

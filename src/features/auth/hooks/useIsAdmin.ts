@@ -12,7 +12,10 @@ import { supabase } from '@/shared/lib/supabase'
 export function useIsAdmin(userId: string | undefined) {
   // Stored next to the id it was checked for, so the previous user's answer is
   // never taken as valid while the new one is still being checked.
-  const [result, setResult] = useState<{ userId: string; isAdmin: boolean } | null>(null)
+  const [result, setResult] = useState<{
+    userId: string
+    isAdmin: boolean
+  } | null>(null)
 
   useEffect(() => {
     if (!userId) return

@@ -4,10 +4,20 @@ import InstagramIcon from '@/shared/components/icons/InstagramIcon'
 import PhoneIcon from '@/shared/components/icons/PhoneIcon'
 
 const SOCIAL_LINKS = [
-  { href: INSTAGRAM_URL, label: 'Instagram', Icon: InstagramIcon, external: true },
+  {
+    href: INSTAGRAM_URL,
+    label: 'Instagram',
+    Icon: InstagramIcon,
+    external: true,
+  },
   { href: FACEBOOK_URL, label: 'Facebook', Icon: FacebookIcon, external: true },
   // The phone is not a social network, but it shares the same round button.
-  { href: PHONE_HREF, label: 'Llamar por teléfono', Icon: PhoneIcon, external: false },
+  {
+    href: PHONE_HREF,
+    label: 'Llamar por teléfono',
+    Icon: PhoneIcon,
+    external: false,
+  },
 ]
 
 export function SocialLinks() {
@@ -19,7 +29,9 @@ export function SocialLinks() {
           href={href}
           // The link carries the accessible name because the icon is decorative.
           aria-label={label}
-          {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          {...(external
+            ? { target: '_blank', rel: 'noopener noreferrer' }
+            : {})}
           className="inline-flex items-center justify-center w-[46px] h-[46px] rounded-full
             border-2 border-line-dark text-bg transition-colors hover:bg-red hover:border-red"
         >

@@ -291,12 +291,11 @@ antes de escribir el DDL**, o acabas con `precio_centimos` en la base de datos y
 
 Tres cosas dependen hoy de que alguien se acuerde:
 
-- **Prettier no es una dependencia.** El código está formateado con él (se nota
-  en las comillas simples y la ausencia de punto y coma), pero no está en
-  `package.json` ni hay `.prettierrc`. Cada quien formatea con lo que tenga su
-  editor, y el día que dos formatos se crucen, un diff de una línea real vendrá
-  con cuarenta de ruido. → `npm i -D prettier`, un `.prettierrc` con lo que ya se
-  usa, y `npx prettier --check .` como tercer paso del CI.
+- ~~**Prettier no es una dependencia.**~~ ✅ HECHO (05/09/2026). `prettier` fijado
+  a la versión exacta 3.9.6, `.prettierrc.json` con lo que ya se usaba
+  (`semi: false`, `singleQuote: true`, `printWidth: 80` — el p90 de las líneas
+  del repo era 77), `npm run format` / `npm run format:check`, y este último
+  como segundo paso del CI, antes del build por ser el fallo más barato.
 - **Nadie corre `npm run preview`.** Es el único sitio donde se ve la CSP, y por
   eso el bug 0.1 lleva ahí desde que se escribió el plugin.
 - **No hay ni un test.** No pasa nada hoy: la app es sobre todo markup, y un
@@ -343,7 +342,7 @@ Nada de esto es urgente salvo lo primero. Lo que no cabe en un rato, no se hace.
 | 2 | ✅ Alias `@/` | hecho el 05/09/2026 | |
 | 0.2 | ✅ `MenuSection`: categorías, `loading` y `error` | hecho el 02/09/2026 | |
 | 1 | ✅ `AdminInput` / `AdminButton` / `AdminHeading` | hecho el 02/09/2026 | |
-| 8 | Prettier en el CI | cuando toque el CI | 15 min |
+| 8 | ✅ Prettier en el CI | hecho el 05/09/2026 | |
 
 Las pautas 3, 4, 7 y 9 no son tareas: son criterios para cuando se escriba el
 código de la tarea 8.

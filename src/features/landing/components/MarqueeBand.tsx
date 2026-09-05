@@ -18,7 +18,9 @@ function MarqueeBand() {
       {MARQUEE_TAGLINES.map((tagline, index) => (
         <span key={index} className="contents">
           <span>{tagline}</span>
-          {index < MARQUEE_TAGLINES.length - 1 && <span className="opacity-75">◆</span>}
+          {index < MARQUEE_TAGLINES.length - 1 && (
+            <span className="opacity-75">◆</span>
+          )}
         </span>
       ))}
     </div>

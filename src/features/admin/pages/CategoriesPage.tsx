@@ -28,7 +28,10 @@ function CategoriesPage() {
     event.preventDefault()
     // At the end by default: a new category should not push the whole menu
     // around until someone says where it goes.
-    const created = await createCategory({ name: name.trim(), sort_order: categories.length + 1 })
+    const created = await createCategory({
+      name: name.trim(),
+      sort_order: categories.length + 1,
+    })
     if (created) setName('')
   }
 
@@ -50,11 +53,16 @@ function CategoriesPage() {
       ) : error ? (
         <p>Error: {error}</p>
       ) : categories.length === 0 ? (
-        <p className="text-gray-500 mb-8">Todavía no hay categorías. Crea la primera.</p>
+        <p className="text-gray-500 mb-8">
+          Todavía no hay categorías. Crea la primera.
+        </p>
       ) : (
         <ul className="mb-8 border-t max-w-md">
           {categories.map((category) => (
-            <li key={category.id} className="flex items-center gap-3 border-b py-2">
+            <li
+              key={category.id}
+              className="flex items-center gap-3 border-b py-2"
+            >
               <AdminInput
                 defaultValue={category.name}
                 disabled={saving}
@@ -72,7 +80,9 @@ function CategoriesPage() {
                 className="w-20"
                 onBlur={(event) =>
                   Number(event.target.value) !== category.sort_order &&
-                  updateCategory(category.id, { sort_order: Number(event.target.value) })
+                  updateCategory(category.id, {
+                    sort_order: Number(event.target.value),
+                  })
                 }
               />
               <AdminButton

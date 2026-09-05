@@ -43,10 +43,15 @@ const EMPTY_ROOT = '<div id="root"></div>'
 // a silent no-op here would ship an empty page that still passes the build and
 // only shows up as a bad LCP weeks later.
 if (!html.includes(EMPTY_ROOT)) {
-  throw new Error(`No se encontró ${EMPTY_ROOT} en dist/index.html: el prerender no se aplicó.`)
+  throw new Error(
+    `No se encontró ${EMPTY_ROOT} en dist/index.html: el prerender no se aplicó.`,
+  )
 }
 
-await writeFile(indexPath, html.replace(EMPTY_ROOT, `<div id="root">${render()}</div>`))
+await writeFile(
+  indexPath,
+  html.replace(EMPTY_ROOT, `<div id="root">${render()}</div>`),
+)
 await rm(serverDir, { recursive: true, force: true })
 
 const kb = (Buffer.byteLength(render()) / 1024).toFixed(1)

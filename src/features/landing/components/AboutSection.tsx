@@ -18,9 +18,9 @@ function AboutSection() {
       </Heading>
 
       <Lead>
-        Un asador familiar de barrio donde la parrilla no se apaga. Recetas caseras y productos de
-        primera calidad, con el trato de toda la vida. Reservas, recogida en tienda y comida para
-        llevar.
+        Un asador familiar de barrio donde la parrilla no se apaga. Recetas
+        caseras y productos de primera calidad, con el trato de toda la vida.
+        Reservas, recogida en tienda y comida para llevar.
       </Lead>
 
       {/* Amber reinforcement block, tilted like a hand-stuck poster */}

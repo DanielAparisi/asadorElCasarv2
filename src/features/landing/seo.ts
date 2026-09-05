@@ -14,10 +14,10 @@ import {
   REGION_CODE,
   WEEKLY_SCHEDULE,
   WHATSAPP_URL,
-// The `.ts` is not a slip: this module is also compiled by tsconfig.node.json
-// —vite.config.ts imports it to write the tags into index.html— and Node's
-// module resolution demands the extension. It is the only file in the project
-// on both sides of that line.
+  // The `.ts` is not a slip: this module is also compiled by tsconfig.node.json
+  // —vite.config.ts imports it to write the tags into index.html— and Node's
+  // module resolution demands the extension. It is the only file in the project
+  // on both sides of that line.
 } from './content.ts'
 
 /**
@@ -46,7 +46,8 @@ export const SITE_TITLE = 'Asador El Casar · Pollo a la brasa en El Casar'
  * is the one place where a plausible-looking wrong value is worse than an
  * absent one: it puts the pin on another street.
  */
-export const COORDINATES = LATITUDE && LONGITUDE ? { latitude: LATITUDE, longitude: LONGITUDE } : null
+export const COORDINATES =
+  LATITUDE && LONGITUDE ? { latitude: LATITUDE, longitude: LONGITUDE } : null
 
 /**
  * The `geo.*` meta tags. They are the old, pre-schema.org way of saying where
@@ -58,8 +59,14 @@ export const GEO_META = [
   { name: 'geo.placename', content: LOCALITY },
   ...(COORDINATES
     ? [
-        { name: 'geo.position', content: `${COORDINATES.latitude};${COORDINATES.longitude}` },
-        { name: 'ICBM', content: `${COORDINATES.latitude}, ${COORDINATES.longitude}` },
+        {
+          name: 'geo.position',
+          content: `${COORDINATES.latitude};${COORDINATES.longitude}`,
+        },
+        {
+          name: 'ICBM',
+          content: `${COORDINATES.latitude}, ${COORDINATES.longitude}`,
+        },
       ]
     : []),
 ]

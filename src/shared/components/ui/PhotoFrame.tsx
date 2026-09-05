@@ -15,7 +15,9 @@ export function PhotoFrame({
         bg-[repeating-linear-gradient(45deg,var(--color-cream)_0_12px,var(--color-cream-alt)_12px_24px)]
         ${className}`}
     >
-      <span className="font-mono text-sm tracking-[0.02em] text-ink-mute">{children}</span>
+      <span className="font-mono text-sm tracking-[0.02em] text-ink-mute">
+        {children}
+      </span>
     </div>
   )
 }

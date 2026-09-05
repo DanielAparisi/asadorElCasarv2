@@ -42,7 +42,10 @@ function Spinner({ delayMs = 250 }: { delayMs?: number }) {
           height when the blocks rise. */}
       <div className="flex gap-3.5 py-3" aria-hidden="true">
         {BLOCKS.map((block) => (
-          <span key={block.color} className={`${BLOCK} ${block.color} ${block.delay}`} />
+          <span
+            key={block.color}
+            className={`${BLOCK} ${block.color} ${block.delay}`}
+          />
         ))}
       </div>
 

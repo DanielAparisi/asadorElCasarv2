@@ -116,7 +116,9 @@ export function useCategories() {
       return false
     }
 
-    setCategories((previous) => previous.filter((category) => category.id !== id))
+    setCategories((previous) =>
+      previous.filter((category) => category.id !== id),
+    )
     return true
   }
 

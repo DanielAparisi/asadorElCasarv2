@@ -41,7 +41,11 @@ import {
  * It applies in development too, unlike the CSP: this way `npm run dev` shows
  * exactly what gets deployed, and the tags can be checked without a build.
  */
-function headPlugin(siteUrl: string, supabaseUrl: string, jsonLd: string): Plugin {
+function headPlugin(
+  siteUrl: string,
+  supabaseUrl: string,
+  jsonLd: string,
+): Plugin {
   // Absolute if the site has a domain, relative otherwise. A relative og:image
   // is ignored by some crawlers, but a wrong absolute one is broken for all of
   // them.
@@ -52,7 +56,10 @@ function headPlugin(siteUrl: string, supabaseUrl: string, jsonLd: string): Plugi
     { name: 'theme-color', content: '#f4f1ea' },
     // Let the photo of the dish be the big preview in the results, and let the
     // snippet run as long as it needs. Both default to something smaller.
-    { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1' },
+    {
+      name: 'robots',
+      content: 'index, follow, max-image-preview:large, max-snippet:-1',
+    },
     // Where the grill is. schema.org says it too, further down, but these are
     // read by Bing and by the directories that scrape rather than parse.
     ...GEO_META,
@@ -74,7 +81,10 @@ function headPlugin(siteUrl: string, supabaseUrl: string, jsonLd: string): Plugi
         // The title lives in seo.ts next to the description it has to agree
         // with; index.html carries a plain one so the file still makes sense
         // opened on its own.
-        html: html.replace(/<title>.*?<\/title>/, `<title>${SITE_TITLE}</title>`),
+        html: html.replace(
+          /<title>.*?<\/title>/,
+          `<title>${SITE_TITLE}</title>`,
+        ),
         tags: [
           // The public menu asks Supabase for the dishes as soon as it paints,
           // so the connection is worth opening while the JavaScript downloads.
@@ -82,14 +92,28 @@ function headPlugin(siteUrl: string, supabaseUrl: string, jsonLd: string): Plugi
             ? [
                 {
                   tag: 'link',
-                  attrs: { rel: 'preconnect', href: supabaseUrl, crossorigin: '' },
+                  attrs: {
+                    rel: 'preconnect',
+                    href: supabaseUrl,
+                    crossorigin: '',
+                  },
                   injectTo: 'head-prepend' as const,
                 },
               ]
             : []),
-          ...metaTags.map((attrs) => ({ tag: 'meta', attrs, injectTo: 'head' as const })),
+          ...metaTags.map((attrs) => ({
+            tag: 'meta',
+            attrs,
+            injectTo: 'head' as const,
+          })),
           ...(siteUrl
-            ? [{ tag: 'link', attrs: { rel: 'canonical', href: siteUrl }, injectTo: 'head' as const }]
+            ? [
+                {
+                  tag: 'link',
+                  attrs: { rel: 'canonical', href: siteUrl },
+                  injectTo: 'head' as const,
+                },
+              ]
             : []),
           {
             tag: 'script',
@@ -138,7 +162,7 @@ function cspPlugin(supabaseUrl: string, jsonLdHash: string): Plugin {
     // not '*' keeps the point of the directive: this is the only page anyone
     // can embed inside, and 'none' here left the map as an empty frame in
     // production while `npm run dev` showed it fine (the plugin is build-only).
-    "frame-src https://www.google.com",
+    'frame-src https://www.google.com',
     'upgrade-insecure-requests',
   ]
 
@@ -198,7 +222,10 @@ export default defineConfig(({ mode }) => {
   const supabaseUrl = env.VITE_SUPABASE_URL?.replace(/['"]/g, '') ?? ''
   // No domain yet (task 4, the deploy): the tags that need an absolute URL are
   // left out until VITE_SITE_URL says what it is.
-  const siteUrl = (env.VITE_SITE_URL?.replace(/['"]/g, '') ?? '').replace(/\/$/, '')
+  const siteUrl = (env.VITE_SITE_URL?.replace(/['"]/g, '') ?? '').replace(
+    /\/$/,
+    '',
+  )
 
   // Built once and shared: the CSP needs the hash of exactly the same string
   // the browser receives.

@@ -11,7 +11,8 @@ import { POSTER_BORDER } from '@/shared/components/ui/tokens'
  */
 
 const CELL = `flex flex-col gap-2.5 px-4.5 pt-4.5 pb-5 ${POSTER_BORDER}`
-const DAY_NAME = 'm-0 font-title text-[1.625rem] tracking-[0.03em] uppercase leading-tight'
+const DAY_NAME =
+  'm-0 font-title text-[1.625rem] tracking-[0.03em] uppercase leading-tight'
 
 /** One open day with its time slots. */
 function DayCard({ day, slots }: { day: string; slots: TimeSlot[] }) {
@@ -56,7 +57,10 @@ function ScheduleSection() {
         ))}
 
         {/* Highlighted cell: the Friday set menu, linking to the order section */}
-        <a href="#reservas" className={`${CELL} bg-amber transition-colors hover:bg-amber-dark`}>
+        <a
+          href="#reservas"
+          className={`${CELL} bg-amber transition-colors hover:bg-amber-dark`}
+        >
           <p className={`${DAY_NAME} text-ink`}>Menú especial</p>
           <p className="m-0 pt-2.5 border-t-2 border-ink text-[0.9375rem] leading-[1.45] text-ink">
             Todos los viernes. Resérvalo el día anterior →

@@ -26,7 +26,9 @@ function DishCard({ dish }: { dish: Dish }) {
           />
         </div>
       ) : (
-        <PhotoFrame className={FRAME}>foto · {dish.name.toLowerCase()}</PhotoFrame>
+        <PhotoFrame className={FRAME}>
+          foto · {dish.name.toLowerCase()}
+        </PhotoFrame>
       )}
 
       <div className="flex items-baseline justify-between gap-3 mt-5.5 border-b-[1.5px] border-ink pb-2">
@@ -39,7 +41,9 @@ function DishCard({ dish }: { dish: Dish }) {
       </div>
 
       {dish.description && (
-        <p className="mt-2 text-[0.9375rem] leading-snug text-ink-soft">{dish.description}</p>
+        <p className="mt-2 text-[0.9375rem] leading-snug text-ink-soft">
+          {dish.description}
+        </p>
       )}
     </li>
   )

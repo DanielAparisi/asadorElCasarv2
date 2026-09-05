@@ -33,7 +33,9 @@ export function useAuth() {
     // With email confirmation enabled there is a user but not yet a session,
     // so waiting for onAuthStateChange is not enough.
     if (!data.session) {
-      setNotice('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.')
+      setNotice(
+        'Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.',
+      )
     }
 
     return true
@@ -44,7 +46,10 @@ export function useAuth() {
     setSubmitting(true)
     clearMessages()
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
     setSubmitting(false)
 
     if (error) {

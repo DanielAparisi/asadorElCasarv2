@@ -28,13 +28,15 @@ export function useSession() {
       setLoading(false)
     })
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      listenerHasSpoken = true
-      setSession(nextSession)
-      // Here too: if getSession() stalls, do not leave the app stuck on the
-      // spinner when the answer is already in.
-      setLoading(false)
-    })
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (_event, nextSession) => {
+        listenerHasSpoken = true
+        setSession(nextSession)
+        // Here too: if getSession() stalls, do not leave the app stuck on the
+        // spinner when the answer is already in.
+        setLoading(false)
+      },
+    )
 
     return () => subscription.subscription.unsubscribe()
   }, [])

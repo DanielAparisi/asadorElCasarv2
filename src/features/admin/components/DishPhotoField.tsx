@@ -59,12 +59,14 @@ function DishPhotoField({
       />
 
       <p className="text-xs text-gray-500 mt-1">
-        Se reduce y se convierte a WebP en el navegador antes de subirla, así que
-        da igual que venga del móvil.
+        Se reduce y se convierte a WebP en el navegador antes de subirla, así
+        que da igual que venga del móvil.
       </p>
 
       {uploading && <p className="text-sm text-gray-500 mt-1">Subiendo…</p>}
-      {uploadError && <p className="text-sm text-red-600 mt-1">{uploadError}</p>}
+      {uploadError && (
+        <p className="text-sm text-red-600 mt-1">{uploadError}</p>
+      )}
 
       {photoPath && !uploading && (
         <button

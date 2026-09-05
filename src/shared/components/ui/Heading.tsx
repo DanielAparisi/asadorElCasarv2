@@ -8,7 +8,9 @@ export function Heading({
   children: React.ReactNode
 }) {
   return (
-    <h2 className={`m-0 font-title font-normal uppercase text-ink tracking-[0.01em] ${className}`}>
+    <h2
+      className={`m-0 font-title font-normal uppercase text-ink tracking-[0.01em] ${className}`}
+    >
       {children}
     </h2>
   )
