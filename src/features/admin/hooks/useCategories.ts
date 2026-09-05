@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../../../shared/lib/supabase'
-import type { Category } from '../../menu/types'
+import { supabase } from '@/shared/lib/supabase'
+import type { Category } from '@/features/menu/types'
 
 export type CategoryInput = {
   name: string

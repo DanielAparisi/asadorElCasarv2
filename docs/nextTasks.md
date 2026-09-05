@@ -603,3 +603,204 @@ Aun así, tres de las cosas que señalaba eran reales:
 Lo que no se ha tocado y sigue siendo el techo: la landing se pinta entera desde
 JavaScript, así que el primer pintado espera a React. Bajar de ahí es
 prerenderizado, y eso es otra tarea y otra decisión.
+
+---
+
+# Las 10 siguientes (05/09/2026)
+
+Sale de repasar lo que quedó marcado **PENDIENTE** arriba, lo que `docs/cleanCode.md`
+dejó sin hacer, y lo que han traído los últimos cuatro commits (prerenderizado,
+CSP, redimensionado de imágenes). El orden vuelve a ser *qué desbloquea más por
+menos esfuerzo*: las cuatro primeras suman una hora larga y son las que separan
+el repo de estar publicado.
+
+Estado al escribir esto: `npm run build` incluye ya `scripts/prerender.mjs`, hay
+un cambio sin commitear en `src/main.tsx` y `src/app/App.tsx`, y no hay ningún
+fichero de despliegue en el repo.
+
+---
+
+## 14. La CSP sigue bloqueando el mapa — ✅ HECHO (05/09/2026)
+
+**~2 min · bug en producción · viene de `docs/cleanCode.md` §0.1**
+
+`vite.config.ts:136` sigue inyectando `frame-src 'none'` y
+`LocationSection.tsx:88` sigue pintando el `<iframe>` de Google Maps. Está
+escrito como urgente desde el 30/08 y no se ha tocado. En `npm run dev` no se ve
+—el plugin es `apply: 'build'`—; se ve en `npm run preview`, que es exactamente
+lo que nadie hace antes de desplegar.
+
+- [x] `"frame-src 'none'"` → `"frame-src https://www.google.com"`
+- [x] Comprobado sobre la build: `dist/index.html` lleva ya
+      `frame-src https://www.google.com` en la meta de CSP
+
+Nada de `*`: la gracia de la directiva es que solo Google Maps pueda empotrarse.
+
+---
+
+## 15. Cerrar la hidratación: el cambio suelto en `main.tsx`
+
+**~20 min · el árbol de trabajo está sucio**
+
+`git status` lleva dos ficheros modificados sin commitear: `App.tsx` exporta
+ahora `isLanding` y `main.tsx` decide con esa bandera en vez de con
+`root.hasChildNodes()`. El razonamiento del comentario es correcto y es el bug
+que el prerenderizado introdujo: hay un solo `index.html` y el hosting lo sirve
+para todas las rutas, así que `/admins` también recibe la landing horneada
+dentro de `#root`; hidratar ahí es pedirle a React que case la carta contra lo
+que pinta el router, no casa nunca, y tira el árbol entero.
+
+Falta comprobarlo de verdad antes de darlo por bueno:
+
+- [ ] `npm run build && npm run preview`, entrar directo a `/admins/equipo` y a
+      `/login` y mirar la consola: cero avisos de hidratación
+- [ ] Recargar `/` y confirmar que **no** repinta (el HTML horneado se adopta)
+- [ ] Commitear los dos ficheros juntos; separados, ninguno compila
+
+---
+
+## 16. Configuración de despliegue
+
+**~30 min · bloqueante para producción · es la tarea 4, sin empezar**
+
+Sigue sin haber `vercel.json`, `netlify.toml` ni `_redirects`. Sin rewrite de
+SPA, recargar en `/admins/equipo` devuelve el 404 del hosting. Con el
+prerenderizado ya hecho, el rewrite es además lo que hace que la landing
+horneada llegue a quien entra por cualquier ruta.
+
+- [ ] Elegir hosting y añadir el rewrite SPA (todo a `/index.html`)
+- [ ] Cabecera `X-Robots-Tag: noindex` para `/admins/*` y `/login`. El comentario
+      de `index.html:9` da eso por hecho desde hace una semana
+- [ ] `VITE_SITE_URL` con el dominio, en el hosting **y** en el `.env` local.
+      Hasta que tenga valor, la tarea 12 deja fuera `og:url`, el `canonical` y la
+      imagen absoluta de la vista previa
+- [ ] Meter `npm run preview` en la rutina previa a cada release: es el único
+      sitio donde la CSP se ejecuta (ver la 14)
+
+---
+
+## 17. Aplicar las migraciones pendientes
+
+**~15 min · seguridad**
+
+Hay ocho ficheros en `supabase/migrations/` y al menos dos que no consta que
+estén aplicados: `20260902212555_drop_plates.sql` (la tabla huérfana con
+`insert`/`update`/`delete` para `anon`, tarea 11) y
+`20260904120000_dish_photos_storage.sql`, que es de anteayer.
+
+- [ ] `npx supabase db push --linked`
+- [ ] Verificar en el SQL Editor que `public.plates` ya no existe
+- [ ] Verificar que subir una foto desde el panel funciona contra el bucket real,
+      no solo en local
+
+Una migración escrita y no aplicada es una migración que no existe, con el
+agravante de que el repo dice lo contrario.
+
+---
+
+## 18. Los datos reales de la carta
+
+**~1 h (la mayor parte no es código) · cierra la 7 y la 8**
+
+Las tablas de Supabase están y el panel escribe en ellas desde la tarea 8. Lo que
+falta son los platos del asador: hoy la carta enseña «pollo entero 12,00 €», que
+es un precio inventado, con un aviso debajo que lo confiesa.
+
+- [ ] Cargar categorías y platos reales desde el panel (`/admins/platos`)
+- [ ] Foto de cada plato
+- [ ] Quitar el aviso «Precios de ejemplo — sustituir por los reales»
+      (`MenuSection.tsx:71`) — **después**, nunca antes: quitarlo con los precios
+      falsos puestos convierte un marcador visible en un precio que parece real
+
+---
+
+## 19. Las coordenadas del local
+
+**~5 min · viene de la tarea 12**
+
+`content.ts:36-37` tiene `LATITUDE` y `LONGITUDE` vacías, así que `seo.ts` omite
+`geo.position`, `ICBM` y el bloque `geo` de la ficha JSON-LD. Para un asador de
+pueblo esa ficha es la mitad del SEO que trae clientes.
+
+- [ ] En Google Maps, clic derecho sobre la puerta del local → la primera línea
+      del menú es el par; pegarlo en `content.ts`
+- [ ] Pasar la URL por el *Rich Results Test* cuando haya dominio (tarea 16)
+
+Un pin a 400 m es peor que ningún pin: por eso están vacías y no aproximadas.
+
+---
+
+## 20. `"strict": true` explícito
+
+**~1 min · viene de `docs/cleanCode.md` §5**
+
+`tsconfig.app.json` sigue sin declararlo. Funciona porque TypeScript 6 lo trae
+por defecto, es decir: depende de un default de la herramienta, no de una
+decisión del proyecto. El día que ese default cambie, el síntoma serán
+`undefined` en producción meses después.
+
+- [ ] Añadir `"strict": true` a `tsconfig.app.json`
+- [ ] De paso, quitar el `!` de `useIsAdmin.ts` capturando el valor en una const
+      dentro del `useEffect`
+
+---
+
+## 21. Alias `@/` para las importaciones — ✅ HECHO (05/09/2026)
+
+**~15 min · viene de `docs/cleanCode.md` §2**
+
+Con `features/` + `shared/` ya asentados, las rutas relativas de tres niveles son
+lo normal en el panel. Un alias las convierte en absolutas y hace que mover un
+fichero deje de romper a sus vecinos.
+
+- [x] `resolve.alias` en `vite.config.ts` (`@` → `src`)
+- [x] `paths` en `tsconfig.app.json`. **Sin `baseUrl`**: TypeScript 6 lo
+      deprecó y el build falla con TS5101 si se declara; desde la 5.0 `paths`
+      ya resuelve relativo al propio tsconfig, así que no hace falta
+- [x] Reescritas las 55 importaciones con dos o más `../` en 26 ficheros. Las de
+      un solo `../` se quedan relativas: dicen «esto es vecino» y eso es
+      información
+
+Un solo criterio, mecánico: dos `../` ya salen del dominio (`features/admin` →
+`features/menu`), así que la frontera del alias es exactamente la frontera entre
+dominios. `npm run lint` limpio y `npm run build` verde, prerenderizado incluido
+—que importa porque `scripts/prerender.mjs` hace una segunda build de Vite y
+habría sido el sitio donde un alias a medias fallaría.
+
+---
+
+## 22. Prettier en el CI
+
+**~15 min · viene de `docs/cleanCode.md` §8**
+
+El CI corre `lint` y `build`. El formato no lo revisa nadie, y se nota: hay
+ficheros con comillas simples y ficheros con dobles, `main.tsx` sin punto y coma
+y el resto con él.
+
+- [ ] Prettier como dependencia de desarrollo, con su `.prettierrc`
+- [ ] `npm run format` y `npm run format:check`
+- [ ] Un paso de `format:check` en `ci.yml`
+- [ ] Pasarlo una vez sobre todo el repo, en un commit **solo de formato**, para
+      que el ruido no se mezcle con ningún cambio real
+
+---
+
+## 23. Medir Lighthouse sobre `preview`
+
+**~20 min · cierra la 13**
+
+El 42 que motivó la tarea 13 estaba medido sobre `npm run dev`, o sea sobre
+módulos sin empaquetar. Desde entonces se han hecho las fuentes locales, los
+esqueletos de la carta, el logo a 160 px, `supabase-js` fuera del chunk público
+y el prerenderizado de la landing — y **ninguna de esas cinco cosas se ha
+medido**.
+
+- [ ] `npm run build && npm run preview` y pasar Lighthouse ahí. Idealmente ya
+      con el dominio de la 16, que es la medida buena
+- [ ] Anotar LCP y CLS en este documento: la 13 dijo que el CLS venía de Anton
+      cargando tarde, y eso o se cayó con las fuentes locales o no
+- [ ] Si el LCP sigue alto con la landing ya horneada, el techo que queda es la
+      imagen del héroe, no el JavaScript
+
+Este es el primer número del proyecto que significa algo. Hasta tenerlo, todo lo
+de la tarea 13 es una hipótesis razonable sin confirmar.

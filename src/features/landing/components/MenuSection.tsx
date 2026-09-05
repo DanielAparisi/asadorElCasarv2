@@ -1,6 +1,6 @@
-import { useMenu } from '../../menu/hooks/useMenu'
-import { Heading } from '../../../shared/components/ui/Heading'
-import { Tag } from '../../../shared/components/ui/Tag'
+import { useMenu } from '@/features/menu/hooks/useMenu'
+import { Heading } from '@/shared/components/ui/Heading'
+import { Tag } from '@/shared/components/ui/Tag'
 import DishCard, { DishCardSkeleton } from './DishCard'
 
 /**

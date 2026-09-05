@@ -1,9 +1,9 @@
 import { ADDRESS, LOCALITY, NAV_LINKS, PHONE_NUMBER, POSTAL_CODE, WHATSAPP_URL } from '../content'
 import { SocialLinks } from './SocialLinks'
-import { BUTTON_ON_INK, Button } from '../../../shared/components/ui/Button'
-import { Brand } from '../../../shared/components/ui/Brand'
-import { PAGE_CONTAINER } from '../../../shared/components/ui/tokens'
-import WhatsAppIcon from '../../../shared/components/icons/WhatsAppIcon'
+import { BUTTON_ON_INK, Button } from '@/shared/components/ui/Button'
+import { Brand } from '@/shared/components/ui/Brand'
+import { PAGE_CONTAINER } from '@/shared/components/ui/tokens'
+import WhatsAppIcon from '@/shared/components/icons/WhatsAppIcon'
 
 /**
  * Footer: brand, repeated menu, contact and small print.

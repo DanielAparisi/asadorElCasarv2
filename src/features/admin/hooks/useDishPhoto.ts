@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { supabase } from '../../../shared/lib/supabase'
-import { DISH_PHOTOS_BUCKET } from '../../menu/dishPhoto'
+import { supabase } from '@/shared/lib/supabase'
+import { DISH_PHOTOS_BUCKET } from '@/features/menu/dishPhoto'
 import { shrinkImage } from '../lib/shrinkImage'
 
 /**

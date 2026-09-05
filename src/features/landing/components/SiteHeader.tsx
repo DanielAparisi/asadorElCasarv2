@@ -1,7 +1,7 @@
 import { NAV_LINKS, PHONE_HREF, PHONE_NUMBER } from '../content'
-import { Brand } from '../../../shared/components/ui/Brand'
-import { PAGE_CONTAINER } from '../../../shared/components/ui/tokens'
-import PhoneIcon from '../../../shared/components/icons/PhoneIcon'
+import { Brand } from '@/shared/components/ui/Brand'
+import { PAGE_CONTAINER } from '@/shared/components/ui/tokens'
+import PhoneIcon from '@/shared/components/icons/PhoneIcon'
 
 /**
  * Header: a full-bleed ink band with the brand, the menu and the phone number

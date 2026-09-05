@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../../../shared/lib/supabase'
+import { supabase } from '@/shared/lib/supabase'
 
 export type Admin = {
   id: number

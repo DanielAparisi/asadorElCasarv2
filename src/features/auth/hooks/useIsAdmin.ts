@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../../../shared/lib/supabase'
+import { supabase } from '@/shared/lib/supabase'
 
 /**
  * Checks whether the user has a row in Admins.

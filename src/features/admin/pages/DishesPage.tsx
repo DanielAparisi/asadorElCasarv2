@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { formatPrice } from '../../menu/formatPrice'
+import { formatPrice } from '@/features/menu/formatPrice'
 import { useCategories } from '../hooks/useCategories'
 import { useDishes } from '../hooks/useDishes'
 import AdminButton from '../components/AdminButton'

@@ -22,7 +22,7 @@ es el que hay que mantener, no subir.
 
 No son de estilo. Son bugs que ya están en el repo.
 
-### 0.1 La CSP bloquea el mapa en producción
+### 0.1 La CSP bloquea el mapa en producción — ✅ HECHO (05/09/2026)
 
 `vite.config.ts` inyecta `frame-src 'none'` en la build. `LocationSection.tsx:76`
 pinta un `<iframe>` de Google Maps. En producción el navegador **se niega a
@@ -115,7 +115,7 @@ segunda.
 
 ---
 
-## 2. Las rutas de importación: `../../../` está a un paso de más
+## 2. Las rutas de importación: `../../../` está a un paso de más — ✅ HECHO (05/09/2026)
 
 37 importaciones del proyecto suben tres niveles:
 
@@ -130,14 +130,14 @@ lo que va a pasar en la tarea 8 cuando `admin/` crezca.
 Arreglo, diez minutos, cero dependencias:
 
 ```jsonc
-// tsconfig.app.json
-"baseUrl": ".",
+// tsconfig.app.json — sin `baseUrl`: TypeScript 6 lo deprecó (TS5101) y desde
+// la 5.0 `paths` ya resuelve relativo a este mismo fichero.
 "paths": { "@/*": ["./src/*"] }
 ```
 
 ```ts
-// vite.config.ts
-resolve: { alias: { '@': path.resolve(__dirname, './src') } }
+// vite.config.ts — `fileURLToPath` y no `__dirname`, que no existe en ESM
+resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } }
 ```
 
 Y entonces `import { supabase } from '@/shared/lib/supabase'` desde cualquier
@@ -337,10 +337,10 @@ Nada de esto es urgente salvo lo primero. Lo que no cabe en un rato, no se hace.
 
 | # | qué | cuándo | tiempo |
 |---|---|---|---|
-| 0.1 | `frame-src` de la CSP | **ya** — el mapa está roto en producción | 2 min |
+| 0.1 | ✅ `frame-src` de la CSP | hecho el 05/09/2026 | |
 | 5 | `"strict": true` explícito | ya, es una línea | 1 min |
 | 6 | ✅ Comprobar las variables de entorno | hecho el 03/09/2026 | |
-| 2 | Alias `@/` | antes de la tarea 8 | 10 min |
+| 2 | ✅ Alias `@/` | hecho el 05/09/2026 | |
 | 0.2 | ✅ `MenuSection`: categorías, `loading` y `error` | hecho el 02/09/2026 | |
 | 1 | ✅ `AdminInput` / `AdminButton` / `AdminHeading` | hecho el 02/09/2026 | |
 | 8 | Prettier en el CI | cuando toque el CI | 15 min |

@@ -1,8 +1,8 @@
-import { PhotoFrame } from '../../../shared/components/ui/PhotoFrame'
-import { POSTER_BORDER } from '../../../shared/components/ui/tokens'
-import { dishPhotoUrl } from '../../menu/dishPhoto'
-import { formatPrice } from '../../menu/formatPrice'
-import type { Dish } from '../../menu/types'
+import { PhotoFrame } from '@/shared/components/ui/PhotoFrame'
+import { POSTER_BORDER } from '@/shared/components/ui/tokens'
+import { dishPhotoUrl } from '@/features/menu/dishPhoto'
+import { formatPrice } from '@/features/menu/formatPrice'
+import type { Dish } from '@/features/menu/types'
 
 /** Same frame for the photo and for the hatched placeholder that stands in
  *  for it, so the grid does not change shape the day the photos arrive. */

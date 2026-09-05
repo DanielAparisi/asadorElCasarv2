@@ -1,6 +1,6 @@
 import { WEEKLY_SCHEDULE, type TimeSlot } from '../content'
-import { SectionHeading } from '../../../shared/components/ui/Heading'
-import { POSTER_BORDER } from '../../../shared/components/ui/tokens'
+import { SectionHeading } from '@/shared/components/ui/Heading'
+import { POSTER_BORDER } from '@/shared/components/ui/tokens'
 
 /**
  * Weekly opening hours.

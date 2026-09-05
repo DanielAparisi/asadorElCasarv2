@@ -1,7 +1,7 @@
 import { ORDER_STEPS, PHONE_HREF, PHONE_NUMBER, WHATSAPP_URL } from '../content'
-import { BUTTON_ON_INK, Button } from '../../../shared/components/ui/Button'
-import { Lead } from '../../../shared/components/ui/Lead'
-import { Tag } from '../../../shared/components/ui/Tag'
+import { BUTTON_ON_INK, Button } from '@/shared/components/ui/Button'
+import { Lead } from '@/shared/components/ui/Lead'
+import { Tag } from '@/shared/components/ui/Tag'
 
 /**
  * Orders and bookings: the ink block, with the two contact buttons on the left

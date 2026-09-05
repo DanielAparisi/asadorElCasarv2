@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Category } from '../../menu/types'
+import type { Category } from '@/features/menu/types'
 import { useCategories } from '../hooks/useCategories'
 import AdminButton from '../components/AdminButton'
 import AdminHeading from '../components/AdminHeading'

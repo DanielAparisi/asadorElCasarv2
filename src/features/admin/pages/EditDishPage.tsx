@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import NotFoundPage from '../../../shared/pages/NotFoundPage'
+import NotFoundPage from '@/shared/pages/NotFoundPage'
 import DishForm from '../components/DishForm'
 import AdminButton from '../components/AdminButton'
 import AdminHeading from '../components/AdminHeading'

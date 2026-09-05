@@ -7,7 +7,7 @@ import ScheduleSection from '../components/ScheduleSection'
 import OrderSection from '../components/OrderSection'
 import LocationSection from '../components/LocationSection'
 import SiteFooter from '../components/SiteFooter'
-import { PAGE_CONTAINER } from '../../../shared/components/ui/tokens'
+import { PAGE_CONTAINER } from '@/shared/components/ui/tokens'
 
 /**
  * The public landing page.

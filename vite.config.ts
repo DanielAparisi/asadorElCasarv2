@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -133,7 +134,11 @@ function cspPlugin(supabaseUrl: string, jsonLdHash: string): Plugin {
     `connect-src 'self' ${supabaseUrl} ${supabaseUrl.replace('https://', 'wss://')}`,
     // An injected form cannot post credentials to another domain.
     "form-action 'self'",
-    "frame-src 'none'",
+    // The map of LocationSection is a Google Maps iframe. Naming the origin and
+    // not '*' keeps the point of the directive: this is the only page anyone
+    // can embed inside, and 'none' here left the map as an empty frame in
+    // production while `npm run dev` showed it fine (the plugin is build-only).
+    "frame-src https://www.google.com",
     'upgrade-insecure-requests',
   ]
 
@@ -201,6 +206,12 @@ export default defineConfig(({ mode }) => {
   const jsonLdHash = `'sha256-${createHash('sha256').update(jsonLd).digest('base64')}'`
 
   return {
+    // `@` is the root of src/. Both this and the `paths` of tsconfig.app.json
+    // are needed: TypeScript resolves the types, Vite resolves the file, and
+    // declaring only the first compiles green and fails at runtime.
+    resolve: {
+      alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    },
     plugins: [
       react(),
       tailwindcss(),

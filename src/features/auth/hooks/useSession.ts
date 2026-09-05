@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
-import { supabase } from '../../../shared/lib/supabase'
+import { supabase } from '@/shared/lib/supabase'
 
 /**
  * The active Supabase Auth session.

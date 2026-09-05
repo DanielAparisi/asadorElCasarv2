@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import type { Session } from '@supabase/supabase-js'
-import { useAuth } from '../../auth/hooks/useAuth'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 
 /**
  * What every panel screen shares: navigation, who is signed in and the sign

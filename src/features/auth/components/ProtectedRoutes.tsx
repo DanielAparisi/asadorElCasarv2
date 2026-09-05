@@ -2,8 +2,8 @@ import { Navigate } from 'react-router-dom'
 import { useSession } from '../hooks/useSession'
 import { useIsAdmin } from '../hooks/useIsAdmin'
 import LoginPage from '../pages/LoginPage'
-import AdminLayout from '../../admin/components/AdminLayout'
-import Spinner from '../../../shared/components/Spinner'
+import AdminLayout from '@/features/admin/components/AdminLayout'
+import Spinner from '@/shared/components/Spinner'
 
 /**
  * Access control for /login and /admins.

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { supabase } from '../../../shared/lib/supabase'
+import { supabase } from '@/shared/lib/supabase'
 
 /**
  * Calls into Supabase Auth, with submit state and result messages.

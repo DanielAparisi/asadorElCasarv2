@@ -1,8 +1,8 @@
 import { PHONE_HREF } from '../content'
-import { Button } from '../../../shared/components/ui/Button'
-import { Lead } from '../../../shared/components/ui/Lead'
-import { PhotoFrame } from '../../../shared/components/ui/PhotoFrame'
-import { PAGE_CONTAINER, POSTER_BORDER } from '../../../shared/components/ui/tokens'
+import { Button } from '@/shared/components/ui/Button'
+import { Lead } from '@/shared/components/ui/Lead'
+import { PhotoFrame } from '@/shared/components/ui/PhotoFrame'
+import { PAGE_CONTAINER, POSTER_BORDER } from '@/shared/components/ui/tokens'
 
 /**
  * The first thing visitors see: headline, lead, the two buttons and the big

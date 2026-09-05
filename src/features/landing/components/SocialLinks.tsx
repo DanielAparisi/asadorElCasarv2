@@ -1,7 +1,7 @@
 import { FACEBOOK_URL, INSTAGRAM_URL, PHONE_HREF } from '../content'
-import FacebookIcon from '../../../shared/components/icons/FacebookIcon'
-import InstagramIcon from '../../../shared/components/icons/InstagramIcon'
-import PhoneIcon from '../../../shared/components/icons/PhoneIcon'
+import FacebookIcon from '@/shared/components/icons/FacebookIcon'
+import InstagramIcon from '@/shared/components/icons/InstagramIcon'
+import PhoneIcon from '@/shared/components/icons/PhoneIcon'
 
 const SOCIAL_LINKS = [
   { href: INSTAGRAM_URL, label: 'Instagram', Icon: InstagramIcon, external: true },

@@ -10,6 +10,9 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
+    // No `baseUrl`: TypeScript 6 deprecated it, and since 5.0 `paths` already
+    // resolves relative to this file. Its twin lives in vite.config.ts.
+    "paths": { "@/*": ["./src/*"] },
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,

@@ -1,4 +1,4 @@
-import { dishPhotoUrl } from '../../menu/dishPhoto'
+import { dishPhotoUrl } from '@/features/menu/dishPhoto'
 import { useDishPhoto } from '../hooks/useDishPhoto'
 
 /**

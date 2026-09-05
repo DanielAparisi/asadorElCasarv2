@@ -1,7 +1,7 @@
-import { Heading } from '../../../shared/components/ui/Heading'
-import { Lead } from '../../../shared/components/ui/Lead'
-import { Tag } from '../../../shared/components/ui/Tag'
-import { POSTER_BORDER } from '../../../shared/components/ui/tokens'
+import { Heading } from '@/shared/components/ui/Heading'
+import { Lead } from '@/shared/components/ui/Lead'
+import { Tag } from '@/shared/components/ui/Tag'
+import { POSTER_BORDER } from '@/shared/components/ui/tokens'
 
 /**
  * "About us": the block that opens the page under the marquee band.

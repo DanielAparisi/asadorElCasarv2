@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../../../shared/lib/supabase'
-import type { Dish } from '../../menu/types'
+import { supabase } from '@/shared/lib/supabase'
+import type { Dish } from '@/features/menu/types'
 import { useDishPhoto } from './useDishPhoto'
 
 /** The columns the panel writes. The database fills in the rest. */

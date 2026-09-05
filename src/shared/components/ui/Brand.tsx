@@ -1,4 +1,4 @@
-import logo from '../../../assets/logo.jpg'
+import logo from '@/assets/logo.jpg'
 
 /** Logo plus name. Used in the site header and, slightly smaller, in the footer. */
 export function Brand({ compact = false }: { compact?: boolean }) {

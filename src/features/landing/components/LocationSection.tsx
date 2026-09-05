@@ -9,9 +9,9 @@ import {
   POSTAL_CODE,
   REGION,
 } from '../content'
-import { Button } from '../../../shared/components/ui/Button'
-import { SectionHeading } from '../../../shared/components/ui/Heading'
-import { POSTER_BORDER } from '../../../shared/components/ui/tokens'
+import { Button } from '@/shared/components/ui/Button'
+import { SectionHeading } from '@/shared/components/ui/Heading'
+import { POSTER_BORDER } from '@/shared/components/ui/tokens'
 
 /** Red mono label heading each detail. */
 function Detail({ label, children }: { label: string; children: React.ReactNode }) {
