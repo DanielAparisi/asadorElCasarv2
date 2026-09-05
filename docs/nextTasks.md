@@ -884,8 +884,39 @@ las migraciones**: el fichero contiene `plates`, la tabla que
 sola al hacer la tarea 17 y volver a generar. Mientras esté, es la prueba en el
 repo de que hay migraciones sin aplicar.
 
-Lo que **no** se ha hecho, y conviene tenerlo escrito: `useMenu` sigue sin
-validar en tiempo de ejecución lo que responde PostgREST — su `select<T>()` es
-un genérico, o sea una afirmación. El enlace con el esquema ya es de compilación
-y eso era lo que faltaba; un validador de verdad sería una tercera copia de la
-forma de las tablas y no vale su precio con dos tablas y sesenta filas.
+### 24.3 Y la validación en ejecución, que había descartado
+
+Aquí decía que `useMenu` seguiría sin comprobar lo que responde PostgREST,
+porque un validador sería «una tercera copia de la forma de las tablas». Se pidió
+igualmente y **el argumento era flojo**: la copia solo es un problema si puede
+desincronizarse, y eso tiene arreglo.
+
+- [x] `src/features/menu/rowGuards.ts`, con `parseCategories` y `parseDishes`
+- [x] `select<T>()` devuelve ahora `unknown`. El genérico era exactamente el
+      mismo `as Dish[]` del que venía de librarse el panel, solo que más
+      difícil de ver
+- [x] Se comprueba **antes** de guardar nada en el estado: una fila mala que
+      llega al estado llega al render, y ahí ya solo queda pintar `NaN €`
+
+Lo que impide la tercera copia es el tipo `Shape<T>`: un mapped type sobre todas
+las claves de `T` con los opcionales quitados (`-?`). Comprobado en los dos
+sentidos —añadir una columna al tipo y no al validador da TS2741; validar una
+que ya no existe da TS2353—, así que no es una copia, es una segunda lectura del
+mismo esquema que el compilador mantiene en su sitio.
+
+Decisiones dentro del validador:
+
+- **Todas las filas o ninguna.** Descartar las malas y pintar el resto esconde
+  el problema: una fila que no encaja significa que el esquema y la app no están
+  de acuerdo, y eso nunca es cosa de esa fila.
+- **`Number.isFinite` y no `typeof === 'number'`**, porque `NaN` es un número y
+  es justo el valor que este fichero existe para que no llegue a un precio.
+- **La fila mala va a la consola.** Lo que ve el visitante es la frase amable de
+  `MenuSection`, así que ese `console.error` es el único rastro que le queda a
+  quien tenga que averiguar qué pasó.
+
+Coste en el chunk público: **+0,68 kB (+0,29 kB gzip)**, de 218,17 a 218,85 kB.
+Comprobado a mano contra once respuestas —fila buena, lista vacía, `price_cents`
+ausente, de texto y `NaN`, `null` en la lista, columna de más, categoría sin
+`sort_order`—: pasa las que debe y rechaza las que debe con el nombre de la
+columna en el mensaje.

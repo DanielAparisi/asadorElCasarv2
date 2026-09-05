@@ -131,10 +131,19 @@ sección.
 
 ```
 types.ts           Dish y Category = columnas de las tablas de Supabase
+                   (recortadas del esquema generado, no escritas a mano)
+rowGuards.ts       comprueba en ejecución que PostgREST devolvió eso mismo
 formatPrice.ts     1250 ↔ "12,50 €" / "12,50" (los dos sentidos)
 dishPhoto.ts       photo_path → URL pública del bucket (sin bucket todavía)
 hooks/useMenu.ts   la única puerta a los datos de la carta
 ```
+
+> **Actualizado (05/09/2026).** `rowGuards.ts` es nuevo y hace falta **solo
+> aquí**: el resto de la app habla con Supabase a través del cliente tipado con
+> el `Database` generado, así que una columna renombrada rompe la compilación.
+> Esta carpeta no, porque la landing no carga `supabase-js` — lo que llega es
+> JSON de `fetch`, y un `select<T>()` genérico habría sido la misma afirmación
+> sin comprobar que los `as Dish[]` que el panel acaba de perder.
 
 > **Actualizado (02/09/2026, tarea 8.3).** El cambio anunciado aquí ya está
 > hecho: `useMenu()` lee las tablas `dishes` y `categories` de Supabase y

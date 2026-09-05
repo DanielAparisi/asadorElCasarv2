@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Category, Dish } from '../types'
+import { parseCategories, parseDishes } from '../rowGuards'
 
 /**
  * The restaurant menu, read from Supabase.
@@ -62,7 +63,11 @@ const HEADERS = {
 const DISH_COLUMNS =
   'id,name,description,price_cents,category_id,sort_order,available,photo_path'
 
-async function select<T>(path: string, signal: AbortSignal): Promise<T> {
+// Returns `unknown` on purpose, and not the `<T>` it used to: a generic here
+// would be a claim about a value nobody has looked at, which is the same `as
+// Dish[]` the panel just got rid of, only harder to see. What turns it into a
+// Dish is ../rowGuards, and it does it by checking.
+async function select(path: string, signal: AbortSignal): Promise<unknown> {
   const response = await fetch(`${REST}/${path}`, { headers: HEADERS, signal })
 
   if (!response.ok) {
@@ -88,16 +93,22 @@ export function useMenu() {
       try {
         // Both at once: they do not depend on each other, and the menu is not
         // painted until both have arrived anyway.
-        const [categoryRows, dishRows] = await Promise.all([
-          select<Category[]>(
+        const [categoryPayload, dishPayload] = await Promise.all([
+          select(
             'categories?select=id,name,sort_order&order=sort_order',
             controller.signal,
           ),
-          select<Dish[]>(
+          select(
             `dishes?select=${DISH_COLUMNS}&order=sort_order`,
             controller.signal,
           ),
         ])
+
+        // Checked before anything is stored: a bad row that reaches the state
+        // is a bad row that reaches the render, and by then the only thing left
+        // to do about it is paint `NaN €`.
+        const categoryRows = parseCategories(categoryPayload)
+        const dishRows = parseDishes(dishPayload)
 
         setCategories(categoryRows)
         // Each category's dishes, in the order the categories go out.
