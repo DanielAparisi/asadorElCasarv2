@@ -37,7 +37,7 @@ export function useCategories() {
       if (controller.signal.aborted) return
 
       if (error) setError(error.message)
-      else setCategories(data as Category[])
+      else setCategories(data)
 
       setLoading(false)
     }
@@ -62,7 +62,7 @@ export function useCategories() {
       return null
     }
 
-    const created = data as Category
+    const created = data
     setCategories((previous) => [...previous, created])
     return created
   }
@@ -84,7 +84,7 @@ export function useCategories() {
       return null
     }
 
-    const updated = data as Category
+    const updated = data
     setCategories((previous) =>
       previous.map((category) => (category.id === id ? updated : category)),
     )

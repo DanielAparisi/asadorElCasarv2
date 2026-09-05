@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/shared/lib/supabase'
+import type { Database } from '@/shared/lib/database.types'
 
-export type Admin = {
-  id: number
-  created_at: string
-  name: string
-}
+/** Cut out of the generated schema, like the menu types. `user_id` is not
+ * selected: whether someone is an admin is asked with useIsAdmin, and this
+ * list is only ever read to be shown. */
+export type Admin = Pick<
+  Database['public']['Tables']['Admins']['Row'],
+  'id' | 'created_at' | 'name'
+>
 
 /**
  * Reads the Admins table and grants admin access to new people.
@@ -63,7 +66,7 @@ export function useAdmins() {
 
     // Appended by hand instead of refetching the list: the row the function
     // returns is exactly the one that was just inserted.
-    setAdmins((previous) => [...previous, data as Admin])
+    setAdmins((previous) => [...previous, data])
     return true
   }
 

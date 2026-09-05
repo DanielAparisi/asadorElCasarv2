@@ -1,26 +1,38 @@
+import type { Database } from '@/shared/lib/database.types'
+
 /**
  * The menu domain types.
  *
- * These are deliberately the exact columns of the future Supabase tables
- * (`categories`, `dishes`), so that swapping the JSON for a query is a change
- * inside `useMenu` and nothing else. Note `price_cents`: the price is an
- * integer number of cents, never a float — see docs/panel.md §2.
+ * They are no longer written by hand: they are cut out of
+ * `shared/lib/database.types.ts`, which `npm run types:db` generates from the
+ * real schema. Before that, these were a promise —a shape someone typed here
+ * and repeated as `data as Dish[]` at every call site— and nothing checked
+ * that Postgres agreed. Now renaming a column in a migration breaks the build
+ * instead of arriving as `undefined` in a price.
+ *
+ * `Pick` and not the whole `Row`: the queries ask for these columns and not
+ * `created_at` / `updated_at`, so claiming to have them would be the same lie
+ * in the other direction.
+ *
+ * Note `price_cents`: the price is an integer number of cents, never a float —
+ * see docs/panel.md §2.
  */
+type Tables = Database['public']['Tables']
 
-export type Category = {
-  id: number
-  name: string
-  sort_order: number
-}
+export type Category = Pick<
+  Tables['categories']['Row'],
+  'id' | 'name' | 'sort_order'
+>
 
-export type Dish = {
-  id: number
-  name: string
-  description: string
-  price_cents: number
-  category_id: number
-  sort_order: number
-  available: boolean
+export type Dish = Pick<
+  Tables['dishes']['Row'],
+  | 'id'
+  | 'name'
+  | 'description'
+  | 'price_cents'
+  | 'category_id'
+  | 'sort_order'
+  | 'available'
   /** Path inside the Storage bucket, not a full URL. Null until it has one. */
-  photo_path: string | null
-}
+  | 'photo_path'
+>

@@ -60,7 +60,7 @@ export function useDishes() {
       if (controller.signal.aborted) return
 
       if (error) setError(error.message)
-      else setDishes(data as Dish[])
+      else setDishes(data)
 
       setLoading(false)
     }
@@ -85,9 +85,8 @@ export function useDishes() {
       return null
     }
 
-    const created = data as Dish
-    setDishes((previous) => [...previous, created])
-    return created
+    setDishes((previous) => [...previous, data])
+    return data
   }
 
   async function updateDish(id: number, changes: Partial<DishInput>) {
@@ -112,19 +111,18 @@ export function useDishes() {
       return null
     }
 
-    const updated = data as Dish
     setDishes((previous) =>
-      previous.map((dish) => (dish.id === id ? updated : dish)),
+      previous.map((dish) => (dish.id === id ? data : dish)),
     )
 
     // The replaced photo, deleted only once the row no longer points at it.
     // The other order —delete first, save second— loses the photo whenever the
     // save fails.
-    if (previousPhoto && previousPhoto !== updated.photo_path) {
+    if (previousPhoto && previousPhoto !== data.photo_path) {
       void removePhoto(previousPhoto)
     }
 
-    return updated
+    return data
   }
 
   /**

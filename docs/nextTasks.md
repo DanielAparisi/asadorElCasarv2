@@ -828,3 +828,64 @@ medido**.
 
 Este es el primer número del proyecto que significa algo. Hasta tenerlo, todo lo
 de la tarea 13 es una hipótesis razonable sin confirmar.
+
+---
+
+## 24. Las dos grietas de la revisión técnica — ✅ HECHO (05/09/2026)
+
+**~1 h · fuera de la lista de diez: salieron de leer el código, no de la lista**
+
+### 24.1 La carta pública se saltaba la comprobación de entorno
+
+`shared/lib/supabaseEnv.ts` existe para que una variable ausente falle con un
+mensaje que la nombre. Pero `features/menu/hooks/useMenu.ts` lee
+`import.meta.env` por su cuenta —a propósito, para no arrastrar el módulo del
+panel al chunk de la landing— y no comprobaba nada. En la única página que ve
+todo el mundo, un `.env` mal puesto viajaba como `Bearer undefined` y volvía
+como un 401 que no nombra nada.
+
+- [x] El mismo guard, repetido en `useMenu.ts`. Repetido y no importado: son
+      seis líneas frente a los 54 kB gzip que este hook existe para no cargar
+- [x] `ci.yml` pasa ahora dos valores de relleno a `npm run build`
+
+Lo segundo no es un parche, es la consecuencia correcta. El CI construía **sin**
+las variables a propósito, «para comprobar que la app compila sin ellas» — pero
+Vite sustituye `import.meta.env.VITE_*` en tiempo de build, así que eso no
+produce una app que las leerá luego: produce una app con `undefined` incrustado
+y la carta rota para siempre. Que ese build falle es lo que se quiere; lo que
+había que cambiar era el CI.
+
+### 24.2 Los `as Dish[]` eran la tarea 1 otra vez
+
+Este documento abre denunciando que `carta.platos as Plato[]` silenciaba a
+TypeScript. Había siete casts de la misma familia repartidos por los hooks del
+panel, y ninguno comprobaba nada: los tipos de `features/menu/types.ts` eran una
+forma escrita a mano y repetida, no el esquema.
+
+- [x] `npm run types:db` → `src/shared/lib/database.types.ts`, generado con
+      `supabase gen types typescript --linked`
+- [x] `createClient<Database>(…)`: con el esquema en el tipo, supabase-js ya
+      sabe qué devuelve cada `select` y los siete casts sobran
+- [x] `Category`, `Dish` y `Admin` recortados del esquema con `Pick`. `Pick` y
+      no el `Row` entero porque las consultas piden unas columnas y no
+      `created_at` / `updated_at`: decir que están sería la misma mentira en la
+      otra dirección
+- [x] Coste en el bundle: **cero**. Es un `import type`, y se borra al compilar
+
+Y de propina, lo que destapó al tipar el cliente: `.eq('user_id', userId)` dejó
+de aceptar un `string | undefined`, que era el `!` de `useIsAdmin.ts` que
+`docs/cleanCode.md` §5 llevaba señalando desde el 30/08. Arreglado como pedía el
+documento, capturando el valor en una const dentro del `useEffect`. Ya no queda
+ningún `!` en el proyecto.
+
+⚠️ **Los tipos generados salen del esquema real, y el real está por detrás de
+las migraciones**: el fichero contiene `plates`, la tabla que
+`20260902212555_drop_plates.sql` borra desde el 02/09. Esa línea desaparecerá
+sola al hacer la tarea 17 y volver a generar. Mientras esté, es la prueba en el
+repo de que hay migraciones sin aplicar.
+
+Lo que **no** se ha hecho, y conviene tenerlo escrito: `useMenu` sigue sin
+validar en tiempo de ejecución lo que responde PostgREST — su `select<T>()` es
+un genérico, o sea una afirmación. El enlace con el esquema ya es de compilación
+y eso era lo que faltaba; un validador de verdad sería una tercera copia de la
+forma de las tablas y no vale su precio con dos tablas y sesenta filas.

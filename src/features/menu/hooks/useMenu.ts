@@ -28,8 +28,27 @@ import type { Category, Dish } from '../types'
 // would end up preloading it — which is the 57 kB this hook exists to avoid.
 // Vite replaces `import.meta.env.VITE_*` at compile time, so this is a string
 // in the bundle and costs nothing.
-const REST = `${import.meta.env.VITE_SUPABASE_URL}/rest/v1`
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+
+// The same guard shared/lib/supabaseEnv.ts makes for the panel, repeated here
+// for the reason above: this module cannot import it without dragging the
+// panel's chunk into the landing.
+//
+// Repeated and not skipped, because this is the page everybody opens. Without
+// it a missing variable travels as the literal string `Bearer undefined` and
+// comes back a 401 that names nothing — the exact failure supabaseEnv was
+// written to prevent, on the only route that has real traffic. It throws at
+// module load, so it fails while building rather than in front of a customer.
+if (!SUPABASE_URL || !ANON_KEY) {
+  throw new Error(
+    'Faltan VITE_SUPABASE_URL y/o VITE_SUPABASE_PUBLISHABLE_KEY. ' +
+      'Créalas en un archivo `.env` en la raíz del proyecto con los valores de ' +
+      'Supabase → Project Settings → API.',
+  )
+}
+
+const REST = `${SUPABASE_URL}/rest/v1`
 
 // The `anon` key travels in both headers because PostgREST wants the role in
 // the bearer token and the gateway wants the key: that is what supabase-js

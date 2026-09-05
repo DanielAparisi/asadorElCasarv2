@@ -31,7 +31,17 @@ jobs:
       # release changes where it puts a line break.
       - run: npm run format:check
 
-      # The build reads VITE_SUPABASE_* from the environment. They are absent
-      # here on purpose: they are public anon values, the build does not need
-      # to reach Supabase, and this checks the app compiles without them.
+      # The build reads VITE_SUPABASE_* from the environment, and these are
+      # placeholders: nothing here talks to Supabase, and the two real values
+      # are public anon ones anyway. They cannot simply be left out any more.
+      #
+      # Vite inlines `import.meta.env.VITE_*` at build time, so a build with no
+      # variables does not produce an app that will read them later — it
+      # produces one with `undefined` baked in, whose menu answers 401 forever.
+      # Since 05/09/2026 both entry points refuse to build in that state
+      # (features/menu/hooks/useMenu.ts, shared/lib/supabaseEnv.ts), which is
+      # why this step now has to hand them something.
       - run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://example.supabase.co
+          VITE_SUPABASE_PUBLISHABLE_KEY: ci-placeholder-not-a-real-key

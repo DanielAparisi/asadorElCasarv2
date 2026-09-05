@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "types:db": "supabase gen types typescript --linked > src/shared/lib/database.types.ts && prettier --write src/shared/lib/database.types.ts",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -77,6 +77,9 @@ queda para lo genuinamente compartido entre features.
 | `npm run dev` | servidor de desarrollo |
 | `npm run build` | comprobación de tipos (`tsc -b`) y build de producción |
 | `npm run lint` | ESLint |
+| `npm run format` | Prettier sobre todo el repo |
+| `npm run format:check` | comprueba el formato sin tocar nada (lo que corre el CI) |
+| `npm run types:db` | regenera `src/shared/lib/database.types.ts` desde el esquema real. **Después de cada migración** |
 | `npm run preview` | sirve el build de producción |
 
 ## Documentación

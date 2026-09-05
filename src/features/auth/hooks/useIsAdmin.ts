@@ -20,19 +20,25 @@ export function useIsAdmin(userId: string | undefined) {
   useEffect(() => {
     if (!userId) return
 
+    // Captured here, and not read from the closure inside `check`: the early
+    // return above narrows `userId` to a string on this line and nowhere else,
+    // because TypeScript cannot know that an async function running later saw
+    // the same value. Holding it in a const is what the `!` used to paper over
+    // (docs/cleanCode.md §5).
+    const id = userId
     const controller = new AbortController()
 
     async function check() {
       const { data, error } = await supabase
         .from('Admins')
         .select('id')
-        .eq('user_id', userId)
+        .eq('user_id', id)
         .abortSignal(controller.signal)
         .maybeSingle()
 
       if (controller.signal.aborted) return
 
-      setResult({ userId: userId!, isAdmin: !error && data !== null })
+      setResult({ userId: id, isAdmin: !error && data !== null })
     }
 
     check()

@@ -217,11 +217,12 @@ después.
 
 Una línea. Convierte un accidente afortunado en una decisión.
 
-Mientras tanto, el `!` de `useIsAdmin.ts:34` (`userId: userId!`) es el tipo de
-grieta que `strict` existe para señalar. Ahí es seguro —hay un `if (!userId)
-return` arriba—, pero la forma de decirlo sin `!` es capturar el valor en una
-const dentro del `useEffect`. **Cada `!` nuevo debería costar un comentario que
-justifique por qué es seguro.** Hoy hay uno; que no lleguen a diez.
+~~Mientras tanto, el `!` de `useIsAdmin.ts:34`~~ ✅ QUITADO (05/09/2026): el
+valor se captura ahora en una const dentro del `useEffect`, que es justo lo que
+este párrafo pedía. Lo destapó el tipado generado del cliente — con el esquema
+en el tipo, `.eq('user_id', userId)` dejó de aceptar un `string | undefined`.
+**Cada `!` nuevo debería costar un comentario que justifique por qué es
+seguro.** Hoy no hay ninguno.
 
 ---
 
