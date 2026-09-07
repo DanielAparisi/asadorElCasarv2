@@ -22,6 +22,34 @@ Estado del repo en el momento de escribir esto: `npm run build` pasa (469 kB /
 > La 8 se ha desglosado en siete partes (8.1–8.7) porque era la única que no
 > cabía en un rato: cada una deja el repo compilando y algo que enseñar, y el
 > orden entre ellas no es negociable.
+>
+> **Actualización 07/09/2026.** Repaso del estado real, comprobado contra el
+> repo y contra el proyecto remoto de Supabase, no de memoria. Cerradas la 21,
+> la 22 y la 24; el código de la 15 lleva commiteado desde el 05/09 (f24e575).
+>
+> **Queda abierto: 15 (solo la comprobación), 16, 17, 18, 19, 20 y 23.**
+>
+> `npx supabase migration list --linked` confirma que faltan exactamente dos
+> migraciones por aplicar, las de la tarea 17. Mientras no se apliquen, **el
+> bucket `dishes` de Storage no existe** y subir una foto desde el panel falla.
+> Cómo funciona todo esto está ahora en
+> [rls-y-migraciones.md](./rls-y-migraciones.md).
+>
+> Lo que de verdad depende del dominio es **una sola cosa**: `VITE_SITE_URL`,
+> y con ella `og:url`, el `canonical` y la imagen absoluta de la vista previa.
+> El rewrite de SPA y el `noindex` de la 16 son iguales tenga el dominio que
+> tenga, así que no hay que esperar a nada para escribirlos.
+>
+> La carta real y las fotos llegan **en torno al 14/09/2026**, así que la 18
+> tiene fecha y las 17 y 16 tienen plazo: conviene llegar a esa semana con la
+> app ya desplegada y el bucket de fotos creado, para que la carga del material
+> sea lo único que quede por hacer.
+>
+> **Para una `v0.0.1` desplegada** —que funcione de punta a punta, no que se
+> anuncie— bastan la 17 y la 16: unos 45 minutos, sobre el `*.vercel.app`
+> gratuito y con `noindex` global. **Abrir al público es otra cosa** y necesita
+> la 18 (los precios reales) y el dominio. `package.json` sigue en
+> `"version": "0.0.0"`: si se etiqueta, hay que subirlo ahí también.
 
 Las tres primeras son media mañana entre las tres. La 8 es la que convierte el
 panel en algo realmente usable.
@@ -638,13 +666,13 @@ Nada de `*`: la gracia de la directiva es que solo Google Maps pueda empotrarse.
 
 ---
 
-## 15. Cerrar la hidratación: el cambio suelto en `main.tsx`
+## 15. Cerrar la hidratación: el cambio suelto en `main.tsx` — ⚠️ COMMITEADO, sin comprobar (07/09/2026)
 
-**~20 min · el árbol de trabajo está sucio**
+**~10 min · el código ya está dentro; falta verificarlo**
 
-`git status` lleva dos ficheros modificados sin commitear: `App.tsx` exporta
-ahora `isLanding` y `main.tsx` decide con esa bandera en vez de con
-`root.hasChildNodes()`. El razonamiento del comentario es correcto y es el bug
+Ya no hay nada suelto: los dos ficheros entraron juntos en f24e575 (05/09) y el
+árbol está limpio. `App.tsx` exporta `isLanding` y `main.tsx` decide con esa
+bandera en vez de con `root.hasChildNodes()`. El razonamiento del comentario es correcto y es el bug
 que el prerenderizado introdujo: hay un solo `index.html` y el hosting lo sirve
 para todas las rutas, así que `/admins` también recibe la landing horneada
 dentro de `#root`; hidratar ahí es pedirle a React que case la carta contra lo
@@ -655,7 +683,10 @@ Falta comprobarlo de verdad antes de darlo por bueno:
 - [ ] `npm run build && npm run preview`, entrar directo a `/admins/equipo` y a
       `/login` y mirar la consola: cero avisos de hidratación
 - [ ] Recargar `/` y confirmar que **no** repinta (el HTML horneado se adopta)
-- [ ] Commitear los dos ficheros juntos; separados, ninguno compila
+- [x] Commitear los dos ficheros juntos; separados, ninguno compila (f24e575)
+
+La comprobación es lo único que queda, y no es un trámite: se puede juntar con
+la de la 23, que también exige `build` + `preview`.
 
 ---
 
@@ -663,7 +694,10 @@ Falta comprobarlo de verdad antes de darlo por bueno:
 
 **~30 min · bloqueante para producción · es la tarea 4, sin empezar**
 
-Sigue sin haber `vercel.json`, `netlify.toml` ni `_redirects`. Sin rewrite de
+Sigue sin haber `vercel.json`, `netlify.toml` ni `_redirects` (comprobado el
+07/09/2026). De los cuatro puntos de abajo, **solo el tercero espera al
+dominio**: el rewrite y el `noindex` se escriben igual sea cual sea, así que no
+hay razón para dejar la tarea entera parada. Sin rewrite de
 SPA, recargar en `/admins/equipo` devuelve el 404 del hosting. Con el
 prerenderizado ya hecho, el rewrite es además lo que hace que la landing
 horneada llegue a quien entra por cualquier ruta.
@@ -681,17 +715,37 @@ horneada llegue a quien entra por cualquier ruta.
 
 ## 17. Aplicar las migraciones pendientes
 
-**~15 min · seguridad**
+**~15 min · seguridad · bloqueante para la 18**
 
-Hay ocho ficheros en `supabase/migrations/` y al menos dos que no consta que
-estén aplicados: `20260902212555_drop_plates.sql` (la tabla huérfana con
-`insert`/`update`/`delete` para `anon`, tarea 11) y
-`20260904120000_dish_photos_storage.sql`, que es de anteayer.
+Ya no es una sospecha. `npx supabase migration list --linked` (07/09/2026, sobre
+`dctddnxvhvbeiyfnxnxj`) dice que de los ocho ficheros hay **seis aplicados y dos
+que no**:
 
-- [ ] `npx supabase db push --linked`
+```
+20260902212555_drop_plates.sql          ❌ PENDIENTE
+20260904120000_dish_photos_storage.sql  ❌ PENDIENTE
+```
+
+Lo que eso significa hoy, en producción:
+
+- `public.plates` sigue existiendo, con `insert`, `update` y `delete` para
+  `anon` heredados de antes de la migración de permisos (tarea 11). Lo tapa el
+  RLS, y esa única-capa-de-defensa es exactamente lo que
+  `20260826100433_seguridad_permisos_por_defecto.sql` existe para no usar.
+- **El bucket `dishes` de Storage no existe.** Cualquier subida de foto desde el
+  panel falla y `menu/dishPhoto.ts` genera URLs que dan 404. Por eso esto
+  bloquea la 18: sin bucket no hay fotos de los platos.
+
+- [ ] `npx supabase db push`
 - [ ] Verificar en el SQL Editor que `public.plates` ya no existe
 - [ ] Verificar que subir una foto desde el panel funciona contra el bucket real,
       no solo en local
+
+Si se aplican a mano desde el SQL Editor en vez de con `db push`, el historial
+no se entera y la CLI las seguirá dando por pendientes; hay que sincronizarlo
+con `npx supabase migration repair --status applied <version>`. El SQL exacto,
+las comprobaciones y el porqué de cada política están en
+[rls-y-migraciones.md](./rls-y-migraciones.md).
 
 Una migración escrita y no aplicada es una migración que no existe, con el
 agravante de que el repo dice lo contrario.
@@ -700,16 +754,23 @@ agravante de que el repo dice lo contrario.
 
 ## 18. Los datos reales de la carta
 
-**~1 h (la mayor parte no es código) · cierra la 7 y la 8**
+**~1 h (la mayor parte no es código) · cierra la 7 y la 8 · material previsto
+para el 14/09/2026 aprox.**
 
 Las tablas de Supabase están y el panel escribe en ellas desde la tarea 8. Lo que
 falta son los platos del asador: hoy la carta enseña «pollo entero 12,00 €», que
 es un precio inventado, con un aviso debajo que lo confiesa.
 
+La carta real y las fotos las entrega el dueño **en torno al 14/09/2026**
+(acordado el 07/09). Eso fija el orden de todo lo demás: **la 17 tiene que estar
+aplicada antes de que llegue el material**, porque sin el bucket `dishes` de
+Storage no hay dónde subir ni una foto y esta tarea se para en seco. Los
+platos sin fotos sí se pueden cargar igualmente.
+
 - [ ] Cargar categorías y platos reales desde el panel (`/admins/platos`)
-- [ ] Foto de cada plato
+- [ ] Foto de cada plato — **requiere la 17 aplicada**
 - [ ] Quitar el aviso «Precios de ejemplo — sustituir por los reales»
-      (`MenuSection.tsx:71`) — **después**, nunca antes: quitarlo con los precios
+      (`MenuSection.tsx:77`) — **después**, nunca antes: quitarlo con los precios
       falsos puestos convierte un marcador visible en un precio que parece real
 
 ---
@@ -718,7 +779,8 @@ es un precio inventado, con un aviso debajo que lo confiesa.
 
 **~5 min · viene de la tarea 12**
 
-`content.ts:36-37` tiene `LATITUDE` y `LONGITUDE` vacías, así que `seo.ts` omite
+`features/landing/content.ts:36-37` sigue con `LATITUDE` y `LONGITUDE` vacías
+(comprobado el 07/09/2026), así que `seo.ts` omite
 `geo.position`, `ICBM` y el bloque `geo` de la ficha JSON-LD. Para un asador de
 pueblo esa ficha es la mitad del SEO que trae clientes.
 
@@ -734,7 +796,8 @@ Un pin a 400 m es peor que ningún pin: por eso están vacías y no aproximadas.
 
 **~1 min · viene de `docs/cleanCode.md` §5**
 
-`tsconfig.app.json` sigue sin declararlo. Funciona porque TypeScript 6 lo trae
+`tsconfig.app.json` sigue sin declararlo (comprobado el 07/09/2026). Funciona
+porque TypeScript 6 lo trae
 por defecto, es decir: depende de un default de la herramienta, no de una
 decisión del proyecto. El día que ese default cambie, el síntoma serán
 `undefined` en producción meses después.
