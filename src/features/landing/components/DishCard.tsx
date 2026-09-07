@@ -35,7 +35,7 @@ function DishCard({ dish }: { dish: Dish }) {
         <span className="font-title text-[1.5rem] leading-tight tracking-[0.02em] uppercase text-ink max-[560px]:text-[1.375rem]">
           {dish.name}
         </span>
-        <span className="font-title text-[1.5rem] leading-tight tracking-[0.02em] uppercase text-red whitespace-nowrap max-[560px]:text-[1.375rem]">
+        <span className="font-title text-[1.5rem] leading-tight tracking-[0.02em] uppercase text-red-dark whitespace-nowrap max-[560px]:text-[1.375rem]">
           {formatPrice(dish.price_cents)}
         </span>
       </div>

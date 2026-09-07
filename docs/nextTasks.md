@@ -27,11 +27,17 @@ Estado del repo en el momento de escribir esto: `npm run build` pasa (469 kB /
 > repo y contra el proyecto remoto de Supabase, no de memoria. Cerradas la 21,
 > la 22 y la 24; el código de la 15 lleva commiteado desde el 05/09 (f24e575).
 >
-> **Queda abierto: 15 (solo la comprobación), 16, 17, 18, 20, 23 y 25.**
+> **Queda abierto: 16, 17, 18, 20 y 25.**
 >
 > _Editado el 07/09/2026, más tarde el mismo día: cerradas también la 19
 > (coordenadas puestas) y el `VITE_SITE_URL` de la 16, que se resolvió sin
 > necesidad de dominio. Añadida la 25, los tests._
+>
+> _Editado otra vez el 07/09/2026, por la tarde: medido Lighthouse sobre
+> `preview`, que cierra la 23 y la 13, comprueba la 15 y destapa la 13b (el
+> contraste de los precios, ya arreglado). **99 / 100 / 100 / 100 con LCP 0,8 s
+> y CLS 0.** De las cinco que quedan, solo la 16 y la 17 impiden que la web
+> funcione._
 >
 > `npx supabase migration list --linked` confirma que faltan exactamente dos
 > migraciones por aplicar, las de la tarea 17. Mientras no se apliquen, **el
@@ -670,9 +676,9 @@ Nada de `*`: la gracia de la directiva es que solo Google Maps pueda empotrarse.
 
 ---
 
-## 15. Cerrar la hidratación: el cambio suelto en `main.tsx` — ⚠️ COMMITEADO, sin comprobar (07/09/2026)
+## 15. Cerrar la hidratación: el cambio suelto en `main.tsx` — ✅ HECHO (07/09/2026)
 
-**~10 min · el código ya está dentro; falta verificarlo**
+**~10 min · commiteado y comprobado**
 
 Ya no hay nada suelto: los dos ficheros entraron juntos en f24e575 (05/09) y el
 árbol está limpio. `App.tsx` exporta `isLanding` y `main.tsx` decide con esa
@@ -682,15 +688,14 @@ para todas las rutas, así que `/admins` también recibe la landing horneada
 dentro de `#root`; hidratar ahí es pedirle a React que case la carta contra lo
 que pinta el router, no casa nunca, y tira el árbol entero.
 
-Falta comprobarlo de verdad antes de darlo por bueno:
+Comprobado el 07/09/2026 sobre `preview`, en la misma sesión que la 23:
 
-- [ ] `npm run build && npm run preview`, entrar directo a `/admins/equipo` y a
-      `/login` y mirar la consola: cero avisos de hidratación
-- [ ] Recargar `/` y confirmar que **no** repinta (el HTML horneado se adopta)
+- [x] Lighthouse sobre `/login` y sobre `/admins/equipo`: **cero errores de
+      consola** en las dos. Un desajuste de hidratación grita en la consola, así
+      que ese silencio es la prueba
+- [x] La home no repinta: **CLS 0,000**. Si React estuviera tirando el árbol y
+      redibujando, ese cero no existiría
 - [x] Commitear los dos ficheros juntos; separados, ninguno compila (f24e575)
-
-La comprobación es lo único que queda, y no es un trámite: se puede juntar con
-la de la 23, que también exige `build` + `preview`.
 
 ---
 
@@ -884,9 +889,9 @@ la cadena exacta `<div id="root"></div>` para inyectar el HTML.
 
 ---
 
-## 23. Medir Lighthouse sobre `preview`
+## 23. Medir Lighthouse sobre `preview` — ✅ HECHO (07/09/2026)
 
-**~20 min · cierra la 13**
+**~20 min · cierra la 13, y de paso destapó la 13b**
 
 El 42 que motivó la tarea 13 estaba medido sobre `npm run dev`, o sea sobre
 módulos sin empaquetar. Desde entonces se han hecho las fuentes locales, los
@@ -894,15 +899,67 @@ esqueletos de la carta, el logo a 160 px, `supabase-js` fuera del chunk público
 y el prerenderizado de la landing — y **ninguna de esas cinco cosas se ha
 medido**.
 
-- [ ] `npm run build && npm run preview` y pasar Lighthouse ahí. Idealmente ya
-      con el dominio de la 16, que es la medida buena
-- [ ] Anotar LCP y CLS en este documento: la 13 dijo que el CLS venía de Anton
-      cargando tarde, y eso o se cayó con las fuentes locales o no
-- [ ] Si el LCP sigue alto con la landing ya horneada, el techo que queda es la
-      imagen del héroe, no el JavaScript
+Medido dos veces sobre `npm run preview`, en móvil: una en DevTools a mano y
+otra en headless con `lighthouse@12`. Los números son estos.
 
-Este es el primer número del proyecto que significa algo. Hasta tenerlo, todo lo
-de la tarea 13 es una hipótesis razonable sin confirmar.
+| | DevTools | headless |
+| --- | --- | --- |
+| Rendimiento | 92 | 99 |
+| Accesibilidad | 95 | 95 |
+| Prácticas recomendadas | 100 | 100 |
+| SEO | 100 | 100 |
+| FCP | 0,4 s | 1,4 s |
+| **LCP** | **0,8 s** | 1,8 s |
+| TBT | 10 ms | 80 ms |
+| **CLS** | **0,000** | **0,000** |
+
+- [x] `npm run build && npm run preview` y pasar Lighthouse ahí
+- [x] Anotados LCP y CLS. **La hipótesis de la 13 queda confirmada: el CLS venía
+      de Anton cargando tarde y las fuentes locales lo mataron.** Cero exacto,
+      en las dos medidas
+- [x] El LCP no es problema: 0,8 s con la landing horneada. La imagen del héroe
+      no hay que tocarla
+- [ ] Repetir con el dominio de la 16, que es la medida definitiva
+
+**El 42 está muerto.** Las cinco cosas de la tarea 13 —fuentes locales,
+esqueletos, logo a 160 px, `supabase-js` fuera del chunk público y el
+prerenderizado— eran correctas y ya están medidas.
+
+Sobre la diferencia entre las dos columnas: es variación de medida, no un
+desacuerdo. Las métricas de DevTools son **mejores** que las de headless, así
+que el 92 no sale de ninguna de las cinco que se ven arriba — se lo lleva el
+Speed Index, que es justo la métrica que penaliza medir con el panel de
+DevTools abierto compitiendo por CPU. Medir en incógnito y sin DevTools.
+
+---
+
+## 13b. El contraste de los precios — ✅ HECHO (07/09/2026)
+
+**~2 min · salió de la 23**
+
+Los dos Lighthouse coincidían en un 95 de accesibilidad, con el mismo motivo:
+el precio de cada plato en `DishCard.tsx` daba **4.10:1** sobre el papel
+(`#e02b20` sobre `#f4f1ea`), y la WCAG AA pide 4.5:1. Seis elementos hoy;
+treinta cuando entre la carta real.
+
+No hizo falta ningún color nuevo. `index.css` ya tenía la respuesta escrita:
+
+```css
+--color-red: #e02b20;       /* the logo red. Background, not text (note 2) */
+--color-red-dark: #b31f16;  /* hover, and the red that is legal for text */
+```
+
+Alguien ya había hecho este razonamiento y había dejado el color legal en su
+sitio. Lo que pasó es que `DishCard.tsx` puso `text-red` donde tocaba
+`text-red-dark`. Un carácter.
+
+- [x] `text-red` → `text-red-dark` en el precio de `DishCard.tsx` (5.96:1)
+- [x] Vuelto a medir: **accesibilidad 100**, `color-contrast` con 0 elementos
+
+Los otros dos rojos grandes se quedan como están y es correcto: el
+`2.875rem` de `OrderSection` y el teléfono de `LocationSection` pasan de 24 px,
+y por encima de ese tamaño la WCAG solo pide 3:1. Por eso Lighthouse señalaba
+los seis precios y nada más.
 
 ---
 
