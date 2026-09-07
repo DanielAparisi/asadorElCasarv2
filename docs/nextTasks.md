@@ -27,7 +27,7 @@ Estado del repo en el momento de escribir esto: `npm run build` pasa (469 kB /
 > repo y contra el proyecto remoto de Supabase, no de memoria. Cerradas la 21,
 > la 22 y la 24; el código de la 15 lleva commiteado desde el 05/09 (f24e575).
 >
-> **Queda abierto: 16, 17, 18, 20 y 25.**
+> **Queda abierto: 16, 17, 18 y 25.**
 >
 > _Editado el 07/09/2026, más tarde el mismo día: cerradas también la 19
 > (coordenadas puestas) y el `VITE_SITE_URL` de la 16, que se resolvió sin
@@ -809,19 +809,24 @@ valor bueno, y no aproximadas.
 
 ---
 
-## 20. `"strict": true` explícito
+## 20. `"strict": true` explícito — ✅ HECHO (en 5b623a5, 05/09/2026)
 
 **~1 min · viene de `docs/cleanCode.md` §5**
 
-`tsconfig.app.json` sigue sin declararlo (comprobado el 07/09/2026). Funciona
-porque TypeScript 6 lo trae
-por defecto, es decir: depende de un default de la herramienta, no de una
-decisión del proyecto. El día que ese default cambie, el síntoma serán
-`undefined` en producción meses después.
+`tsconfig.app.json:3` lo declara. Funcionaba igual sin él porque TypeScript 6 lo
+trae por defecto, y esa era exactamente la objeción: dependía de un default de
+la herramienta y no de una decisión del proyecto. El día que ese default cambie,
+el síntoma serían `undefined` en producción meses después.
 
-- [ ] Añadir `"strict": true` a `tsconfig.app.json`
-- [ ] De paso, quitar el `!` de `useIsAdmin.ts` capturando el valor en una const
-      dentro del `useEffect`
+- [x] Añadir `"strict": true` a `tsconfig.app.json`
+- [x] De paso, quitar el `!` de `useIsAdmin.ts` capturando el valor en una const
+      dentro del `useEffect` — hecho, con el porqué en el comentario de la
+      línea 26
+
+> ⚠️ Esta tarea estuvo marcada como pendiente hasta el 07/09/2026, con un
+> «comprobado» que era falso: la comprobación se hizo mal y dio un falso
+> negativo sobre un fichero que ya lo declaraba desde el 05/09. Anotado porque
+> un «comprobado» equivocado en esta lista es peor que una tarea sin comprobar.
 
 ---
 
