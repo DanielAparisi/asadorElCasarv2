@@ -27,7 +27,11 @@ Estado del repo en el momento de escribir esto: `npm run build` pasa (469 kB /
 > repo y contra el proyecto remoto de Supabase, no de memoria. Cerradas la 21,
 > la 22 y la 24; el código de la 15 lleva commiteado desde el 05/09 (f24e575).
 >
-> **Queda abierto: 15 (solo la comprobación), 16, 17, 18, 19, 20 y 23.**
+> **Queda abierto: 15 (solo la comprobación), 16, 17, 18, 20, 23 y 25.**
+>
+> _Editado el 07/09/2026, más tarde el mismo día: cerradas también la 19
+> (coordenadas puestas) y el `VITE_SITE_URL` de la 16, que se resolvió sin
+> necesidad de dominio. Añadida la 25, los tests._
 >
 > `npx supabase migration list --linked` confirma que faltan exactamente dos
 > migraciones por aplicar, las de la tarea 17. Mientras no se apliquen, **el
@@ -991,3 +995,64 @@ Comprobado a mano contra once respuestas —fila buena, lista vacía, `price_cen
 ausente, de texto y `NaN`, `null` en la lista, columna de más, categoría sin
 `sort_order`—: pasa las que debe y rechaza las que debe con el nombre de la
 columna en el mensaje.
+
+---
+
+## 25. Tests: vitest y cuatro funciones puras
+
+**~1 h 30 min · después del lanzamiento, no antes**
+
+Hoy no hay ni un test en el repo. El CI corre `format:check`, `lint` y `build`,
+y eso ya coge bastante —`tsc` en estricto es media red de seguridad—, pero hay
+cuatro sitios donde un fallo no lo ve nadie.
+
+El alcance es deliberadamente pequeño: **vitest y cuatro ficheros de test sobre
+funciones puras**. Nada más.
+
+- [ ] `vitest` como dependencia de desarrollo, fijada a versión exacta como se
+      hizo con prettier en la tarea 22
+- [ ] `menu/rowGuards.ts` — los once casos que ya se probaron a mano al
+      escribirlo (fila buena, lista vacía, `price_cents` ausente, de texto y
+      `NaN`, `null` en la lista, columna de más, categoría sin `sort_order`).
+      Hoy esos once casos viven en un párrafo de la tarea 24.2 en vez de en el
+      CI. Es lo único que separa una fila mala de Supabase de la carta pública
+- [ ] `landing/seo.ts` — snapshot de `buildRestaurantJsonLd` y de
+      `buildLlmsTxt`. Es el que más vale de los cuatro porque **el SEO se rompe
+      en silencio**: nadie nota que el JSON-LD perdió los horarios hasta que
+      pasan dos meses y el asador no sale en Google
+- [ ] `menu/formatPrice.ts` — céntimos a `18,50 €`. El caso clásico y su bug
+      clásico: `1200` no es `12 €` ni `1200,00 €`
+- [ ] `resolveSiteUrl` de `vite.config.ts` — los seis escenarios que se
+      probaron a mano el 07/09 lanzando seis builds enteros: sin nada, Vercel,
+      `URL` sin la bandera `NETLIFY`, Netlify de verdad, la prioridad de
+      `VITE_SITE_URL` y el valor con errata que tiene que romper el build
+- [ ] `npm test` en `ci.yml`, después del `format:check`
+
+Las cuatro **ya son puras**, así que no hay que refactorizar nada para
+probarlas. No es casualidad: es el rédito de haber separado `seo.ts` de
+`vite.config.ts` y `rowGuards.ts` de `useMenu.ts`. El trabajo caro ya está
+hecho.
+
+### Lo que queda fuera, y por qué
+
+**Tests de componentes.** El panel todavía cambia de forma cada semana; probar
+componentes ahora es escribir tests para borrarlos. Y lo que de verdad
+querríamos comprobar de `/admins/platos` no es el marcado, es que el guardado
+llega a Supabase — que es justo lo que un test de componente no ve.
+
+**Playwright o cualquier e2e.** Montar un navegador en CI para un sitio de una
+página y un usuario. Cuando algo se rompa te enteras abriendo la web, que es lo
+que vas a hacer de todas formas.
+
+**Tests de RLS (pgTAP).** Este es el único que duele dejar fuera, porque es el
+único sitio del proyecto donde un fallo no es un bug sino un incidente: una
+política mal escrita expone datos y no lo ve ni TypeScript, ni el linter, ni
+ninguno de los cuatro tests de arriba.
+
+Se queda fuera **por ahora** y con una condición de salida clara: las políticas
+son cuatro, todas siguen el mismo molde de dos y no cambian casi nunca.
+Mientras eso siga siendo verdad, `npx supabase db advisors` y las consultas de
+auditoría de [rls-y-migraciones.md](./rls-y-migraciones.md) §7 cubren lo mismo
+por mucho menos. **El día que aparezca una política con condiciones de verdad
+—pedidos, reservas, cualquier cosa por usuario— esto sube al principio de la
+lista.**

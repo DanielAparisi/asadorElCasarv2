@@ -14,22 +14,6 @@ import {
 } from './src/features/landing/seo.ts'
 
 /**
- * Injects the Content-Security-Policy into the built HTML.
- *
- * Production only: in development Vite needs websockets and inline scripts for
- * HMR, and a strict CSP would break it.
- *
- * This is a second line of defence. The first is that React escapes everything
- * it interpolates, so an XSS would need a `dangerouslySetInnerHTML` or a
- * `javascript:` href. The CSP exists for the day someone introduces one of the
- * two without noticing: even if a script is injected, the browser refuses to
- * run it.
- *
- * It matters more than it looks because supabase-js keeps the session token in
- * localStorage: an XSS in this app is not an `alert()`, it is stealing an
- * admin's session and with it the ability to write to the database.
- */
-/**
  * Writes the whole head that does not depend on React: the title, the
  * description, the link preview, the location and the business card.
  *
@@ -127,6 +111,38 @@ function headPlugin(
   }
 }
 
+/**
+ * Injects the Content-Security-Policy into the built HTML.
+ *
+ * Production only: in development Vite needs websockets and inline scripts for
+ * HMR, and a strict CSP would break it. That asymmetry is the thing to keep in
+ * mind while reading the directives below — none of them is exercised by
+ * `npm run dev`, so a mistake here shows up for the first time in front of a
+ * customer. `npm run preview` is the only place it can be caught earlier.
+ *
+ * This is a second line of defence. The first is that React escapes everything
+ * it interpolates, so an XSS would need a `dangerouslySetInnerHTML` or a
+ * `javascript:` href. The CSP exists for the day someone introduces one of the
+ * two without noticing: even if a script is injected, the browser refuses to
+ * run it.
+ *
+ * It matters more than it looks because supabase-js keeps the session token in
+ * localStorage: an XSS in this app is not an `alert()`, it is stealing an
+ * admin's session and with it the ability to write to the database.
+ *
+ * `jsonLdHash` is not a parameter for tidiness — it is half of a pact with
+ * `headPlugin`. Both are handed the *same* JSON-LD string built once in
+ * `defineConfig`: one writes it into the page, the other authorises exactly
+ * that byte sequence. Build the string twice and a single space of difference
+ * means the browser blocks the business card, silently and only in production.
+ *
+ * Its ceiling is that it travels as a `<meta>`. `frame-ancestors`,
+ * `report-uri` and `sandbox` are ignored there, so nothing here can stop the
+ * panel being framed for clickjacking, and the policy only covers index.html
+ * rather than every response. The fix is not in this file: it is to serve
+ * these same directives as a real header from the hosting once there is one
+ * (docs/seguridad.md, and task 16 of docs/nextTasks.md).
+ */
 function cspPlugin(supabaseUrl: string, jsonLdHash: string): Plugin {
   const directives = [
     "default-src 'self'",
