@@ -705,9 +705,13 @@ horneada llegue a quien entra por cualquier ruta.
 - [ ] Elegir hosting y añadir el rewrite SPA (todo a `/index.html`)
 - [ ] Cabecera `X-Robots-Tag: noindex` para `/admins/*` y `/login`. El comentario
       de `index.html:9` da eso por hecho desde hace una semana
-- [ ] `VITE_SITE_URL` con el dominio, en el hosting **y** en el `.env` local.
-      Hasta que tenga valor, la tarea 12 deja fuera `og:url`, el `canonical` y la
-      imagen absoluta de la vista previa
+- [x] `VITE_SITE_URL` — resuelto el 07/09/2026 sin necesidad de dominio.
+      `resolveSiteUrl()` en `vite.config.ts` la busca en tres sitios por orden:
+      la variable propia, `VERCEL_PROJECT_PRODUCTION_URL` y, con la bandera
+      `NETLIFY` puesta, `URL`. Al desplegar, `og:url`, el `canonical`, la imagen
+      absoluta de la vista previa y la ficha de Google salen solos con el
+      dominio del hosting, y pasan al dominio de verdad el día que se conecte,
+      sin tocar código. Ponerla a mano sigue ganando sobre las dos automáticas
 - [ ] Meter `npm run preview` en la rutina previa a cada release: es el único
       sitio donde la CSP se ejecuta (ver la 14)
 
@@ -775,20 +779,24 @@ platos sin fotos sí se pueden cargar igualmente.
 
 ---
 
-## 19. Las coordenadas del local
+## 19. Las coordenadas del local — ✅ HECHO salvo la validación (07/09/2026)
 
 **~5 min · viene de la tarea 12**
 
-`features/landing/content.ts:36-37` sigue con `LATITUDE` y `LONGITUDE` vacías
-(comprobado el 07/09/2026), así que `seo.ts` omite
-`geo.position`, `ICBM` y el bloque `geo` de la ficha JSON-LD. Para un asador de
-pueblo esa ficha es la mitad del SEO que trae clientes.
+`features/landing/content.ts:36-37` ya lleva el par real
+(`40.70335897234499` / `-3.431043860947269`, que cae en El Casar), así que
+`seo.ts` vuelve a escribir `geo.position`, `ICBM` y el bloque `geo` de la ficha
+JSON-LD. Para un asador de pueblo esa ficha es la mitad del SEO que trae
+clientes.
 
-- [ ] En Google Maps, clic derecho sobre la puerta del local → la primera línea
+- [x] En Google Maps, clic derecho sobre la puerta del local → la primera línea
       del menú es el par; pegarlo en `content.ts`
+- [x] Comprobado sobre el build: salen las cuatro etiquetas y el `geo` entra en
+      el JSON-LD
 - [ ] Pasar la URL por el *Rich Results Test* cuando haya dominio (tarea 16)
 
-Un pin a 400 m es peor que ningún pin: por eso están vacías y no aproximadas.
+Un pin a 400 m es peor que ningún pin: por eso estuvieron vacías hasta tener el
+valor bueno, y no aproximadas.
 
 ---
 

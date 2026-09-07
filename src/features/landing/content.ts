@@ -25,16 +25,20 @@ export const REGION = 'Guadalajara'
 export const REGION_CODE = 'ES-GU'
 
 /**
- * Coordinates of the door, for local search.
+ * Coordinates of the door, for local search (filled in 07/09/2026).
  *
- * Empty on purpose: they have to be the real ones. In Google Maps, right click
- * on the spot → the first line of the menu is the pair, copy it here as
- * `40.703123` / `-3.428456`. While they are empty the geo tags and the `geo`
- * block of the business card are left out, which is the right thing — a
- * restaurant pinned 400 m away is worse than one with no pin at all.
+ * They have to be the real ones, taken from the spot itself: in Google Maps,
+ * right click on the door → the first line of the menu is the pair. They were
+ * left empty until they could be, because `seo.ts` drops the geo tags and the
+ * `geo` block of the business card when either is missing, and a restaurant
+ * pinned 400 m away is worse than one with no pin at all.
+ *
+ * Strings and not numbers so they reach schema.org unrounded, and so an empty
+ * one is falsy — which is what `seo.ts` checks to decide whether to write the
+ * tags at all.
  */
-export const LATITUDE = ''
-export const LONGITUDE = ''
+export const LATITUDE = '40.70335897234499'
+export const LONGITUDE = '-3.431043860947269'
 export const MAPS_DIRECTIONS_URL =
   'https://www.google.com/maps/dir/?api=1&destination=Calle+Alcaldes+de+la+Villa+23,+19170+El+Casar,+Guadalajara'
 export const MAPS_EMBED_URL =

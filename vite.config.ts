@@ -217,15 +217,98 @@ function llmsTxtPlugin(siteUrl: string): Plugin {
   }
 }
 
+/**
+ * The public origin of the site — `https://asadorelcasar.es` — or an empty
+ * string while there is not one yet.
+ *
+ * Everything that needs an absolute URL hangs off this: `og:url`, the
+ * `canonical`, the absolute `og:image` of the WhatsApp preview, and the `url`
+ * and `hasMenu` of the Google business card. When it comes back empty those
+ * fields are left out rather than guessed, because a canonical pointing at a
+ * domain that is not ours is worse than no canonical at all.
+ *
+ * It is resolved here, at build time, and not read in the browser, for the same
+ * reason `headPlugin` exists: a preview crawler reads the HTML it downloads and
+ * never runs the JavaScript, so `window.location.origin` would arrive too late
+ * for the only readers these tags are written for.
+ *
+ * Step by step:
+ *
+ * 1. Look for the value in three places, in order of how much they are worth.
+ * 2. Take the first one that is actually filled in.
+ * 3. Clean it up: quotes, whitespace, missing protocol, trailing slash.
+ * 4. Check it parses as a URL, and fail the build loudly if it does not.
+ *
+ * The reason for steps 1 and 2 is that the domain is not known yet and this
+ * should not stay broken until it is: the hosting already knows what URL it is
+ * serving, and it says so in an environment variable of its own. So the moment
+ * the site is deployed the tags start being correct on their own, and the day a
+ * real domain is pointed at it they follow along without touching any code.
+ */
+function resolveSiteUrl(env: Record<string, string>): string {
+  // ── Step 1. The three candidates, best first ──────────────────────────────
+  const candidates = [
+    // 1a. What .env or the hosting's dashboard says. This one wins over
+    //     everything: it is the only one a person chose on purpose.
+    ['VITE_SITE_URL', env.VITE_SITE_URL],
+
+    // 1b. Vercel. Deliberately NOT `VERCEL_URL`: that one is the URL of this
+    //     particular deployment (`asador-a1b2c3.vercel.app`) and changes with
+    //     every push, which is exactly what a canonical must never do.
+    //     `VERCEL_PROJECT_PRODUCTION_URL` is the stable production domain, and
+    //     it becomes the custom domain by itself once one is attached.
+    ['VERCEL_PROJECT_PRODUCTION_URL', env.VERCEL_PROJECT_PRODUCTION_URL],
+
+    // 1c. Netlify, where the equivalent is called `URL`. Guarded behind the
+    //     `NETLIFY` flag because `URL` is far too generic a name to trust on a
+    //     laptop: plenty of shells and tools set one for their own reasons.
+    ['URL', env.NETLIFY ? env.URL : undefined],
+  ] as const
+
+  // ── Step 2. The first one with something in it ────────────────────────────
+  // `.trim()` before the emptiness check: a variable set to a single space in a
+  // hosting dashboard is a variable nobody filled in.
+  const found = candidates.find(([, value]) => value?.trim())
+  if (!found) return ''
+  const [name, value] = found as readonly [string, string]
+
+  // ── Step 3. Clean it up ───────────────────────────────────────────────────
+  // Quotes first: `VITE_SITE_URL="https://…"` in a .env keeps its quotes here,
+  // and they would end up inside the tag.
+  let raw = value.trim().replace(/['"]/g, '')
+
+  // The hosting variables come as a bare hostname, with no scheme — Vercel
+  // hands over `asador.vercel.app` and not `https://asador.vercel.app`. Add it
+  // when it is missing; https and not http, because neither host serves
+  // anything else and a canonical over http would redirect.
+  if (!/^https?:\/\//.test(raw)) raw = `https://${raw}`
+
+  // No trailing slash. Every consumer builds `${siteUrl}/algo`, so leaving it
+  // would produce `https://…//og.jpg` — which loads, but is a second URL for
+  // the same image and the crawlers' caches treat it as such.
+  raw = raw.replace(/\/+$/, '')
+
+  // ── Step 4. Make sure it is a real URL ────────────────────────────────────
+  // A typo here is invisible: the build passes, the tags come out, and the
+  // damage shows up weeks later as a WhatsApp preview nobody can explain. So
+  // it stops the build instead, naming the variable that carried the value.
+  try {
+    // `.origin` also drops any path someone pasted along with the domain.
+    return new URL(raw).origin
+  } catch {
+    throw new Error(
+      `${name} no es una URL válida: ${JSON.stringify(value)}. ` +
+        'Tiene que ser el origen del sitio, por ejemplo https://asadorelcasar.es',
+    )
+  }
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const supabaseUrl = env.VITE_SUPABASE_URL?.replace(/['"]/g, '') ?? ''
-  // No domain yet (task 4, the deploy): the tags that need an absolute URL are
-  // left out until VITE_SITE_URL says what it is.
-  const siteUrl = (env.VITE_SITE_URL?.replace(/['"]/g, '') ?? '').replace(
-    /\/$/,
-    '',
-  )
+  // Empty until there is a domain, or until this is built on the hosting —
+  // whichever comes first. See resolveSiteUrl above.
+  const siteUrl = resolveSiteUrl(env)
 
   // Built once and shared: the CSP needs the hash of exactly the same string
   // the browser receives.
