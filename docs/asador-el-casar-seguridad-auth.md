@@ -405,6 +405,63 @@ en `.gitignore`.
 
 ---
 
+## Anexo C — ¿El SQL en el repo o solo en el dashboard?
+
+**En el repo, como migraciones.** El dashboard solo para los datos.
+
+### Publicar las políticas RLS no es una fuga
+
+La seguridad de RLS no depende de que nadie sepa cómo están escritas — depende de
+que estén bien escritas. Si conocer tu política la rompe, ya estaba rota. Principio
+de Kerckhoffs: el diseño puede ser público, el secreto es la clave.
+
+Lo que **nunca** va al repo es otra cosa, y no es SQL:
+
+- `service_role` key
+- JWT secret
+- Contraseña de la base de datos
+
+### Por qué el dashboard no puede ser la única fuente
+
+- **No hay historial.** No te dice qué cambió, cuándo, ni por qué. Para políticas de
+  seguridad, poder hacer `git blame` sobre "por qué esta política dice `using (true)`"
+  vale mucho.
+- **No es reproducible.** El día que quieras un entorno de pruebas, o que algo se
+  rompa y toque rehacerlo, estarás reconstruyendo de memoria a base de clics.
+- **No es revisable.** Un cambio de política es justo el tipo de cosa que quieres leer
+  dos veces antes de aplicar. En un diff se ve; en un formulario del dashboard, no.
+
+### Flujo con el CLI de Supabase
+
+```bash
+supabase migration new cerrar_admins   # crea supabase/migrations/<ts>_cerrar_admins.sql
+# escribes el SQL de los pasos 1, 2, 5 y 6 en ese fichero
+supabase db push
+```
+
+Si ya has aplicado cosas a mano desde el dashboard, captúralas sin reescribir nada:
+
+```bash
+supabase db diff -f estado_actual
+```
+
+### Lo que sí sale del repo
+
+Los `insert into public.admins values ('jefe@asadorelcasar.com')`.
+
+Eso no es configuración, son **datos personales**. Si el repo es público, estás
+publicando los emails de los dueños en un fichero indexable.
+
+La regla: **las migraciones definen la estructura; a quién autorizas lo haces desde
+el dashboard**, o desde un seed que no se commitea.
+
+```
+supabase/migrations/   → tablas, funciones, triggers, políticas   ✅ commit
+supabase/seed.sql      → emails reales de admins                  ❌ .gitignore
+```
+
+---
+
 ## Pendiente (fuera del alcance de auth)
 
 Del repaso a la arquitectura, sigue abierto:
